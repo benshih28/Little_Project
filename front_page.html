@@ -3,192 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Little_Project</title>
-
-
-    <style>
-        /*label choice*/
-        /*id choice*/
-        /*class choice*/
-        /* `>`、 ` ` 、`+`、 `~` */
-        /*has*/
-
-        /*[]*/
-        /*`:` link visited hover active focus checked*/
-        /*first-child last-child nth-child(n) nth-of-type(n) nor(selector)*/
-
-        /*valid invalid*/
-
-        /*`::` before after*/
-
-        /*text-decoration */
-        /*text-align*/
-        /* display*/
-        /* grid*/
-
-        /*background-image*/
-        /*background-repeat*/
-        /*background-attachment*/
-        /*background-position*/
-        /*background-clip*/
-        /*background-color*/
-
-        /*visibility:*/
-
-        /* padding */
-
-        /* calc() */
-
-        /*cursor:pointer*/
-
-        /* position */
-
-        /* border-width */
-
-        /*border-style*/
-
-        /* border-color */
-
-        /* border-radius */
-
-        /*paddin g*/
-
-        /*margin*/
-
-        /*box-sizing*/
-
-        /* object-fit */
-
-        /* overflow */
-
-        /* opacity */
-        
-        /* filter */
-
-    </style>
-
+    <title>HTML 標籤拖拽工具</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="drag_and_drop.css">
 </head>
 <body>
-    
-    <!--link-->
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">HTML 工具</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="htmlDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">HTML</a>
+                        <ul class="dropdown-menu" aria-labelledby="htmlDropdown">
+                            <li><a class="dropdown-item" href="#" id="loadStyleTags">風格與語氣標籤</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="cssDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">CSS</a>
+                        <ul class="dropdown-menu" aria-labelledby="cssDropdown">
+                            <li><a class="dropdown-item" href="#">選擇器</a></li>
+                            <li><a class="dropdown-item" href="#">盒模型</a></li>
+                            <li><a class="dropdown-item" href="#">動畫</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="bootstrapDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Bootstrap</a>
+                        <ul class="dropdown-menu" aria-labelledby="bootstrapDropdown">
+                            <li><a class="dropdown-item" href="#">網格系統</a></li>
+                            <li><a class="dropdown-item" href="#">元件</a></li>
+                            <li><a class="dropdown-item" href="#">實用工具</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-    <!--br-->
+    <div class="container mt-5">
+        <h3 slot=>HTML 標籤拖拽工具</h3>
+        <p>將上方的 HTML 標籤拖到下方的畫庫來顯示效果。</p>
 
-    <!--hr-->
+        <!-- 可拖拽的 HTML 標籤 -->
+        <div class="d-flex flex-wrap" id="dragItems">
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="headingDropdown" data-bs-toggle="dropdown" aria-expanded="false">標題 (h1-h6)
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="headingDropdown">
+                    <li><a class="dropdown-item drag-item" draggable="true" data-html="<h1>標題 H1</h1>">H1</a></li>
+                    <li><a class="dropdown-item drag-item" draggable="true" data-html="<h2>標題 H2</h2>">H2</a></li>
+                    <li><a class="dropdown-item drag-item" draggable="true" data-html="<h3>標題 H3</h3>">H3</a></li>
+                    <li><a class="dropdown-item drag-item" draggable="true" data-html="<h4>標題 H4</h4>">H4</a></li>
+                    <li><a class="dropdown-item drag-item" draggable="true" data-html="<h5>標題 H5</h5>">H5</a></li>
+                    <li><a class="dropdown-item drag-item" draggable="true" data-html="<h6>標題 H6</h6>">H6</a></li>
+                </ul>
+            </div>
+            <div class="drag-item" draggable="true" data-html="<p>這是一段文字</p>">段落 (p)</div>
+            <div class="drag-item" draggable="true" data-html="<a href='#'>連結</a>">連結 (a)</div>
+            <div class="drag-item" draggable="true" data-html="<ul><li>項目1</li><li>項目2</li></ul>">無序列表 (ul)</div>
+            <div class="drag-item" draggable="true" data-html="<img src='https://via.placeholder.com/150' alt='範例圖片'>">圖片 (img)</div>
+        </div>
 
-    <!--pre-->
-
-    <!--div-->
-
-    <!--b i s u-->
-
-    <!--&nbsp &lt &gt-->
-
-
-    <!--ul(li) ol(li)-->
-
-    <!--dl(dt dd)-->
-
-    <!--a-->
-
-    <!--img-->
-    <!-- class="figure-img"-->
-
-    <!--figure(figcaption)-->
-    <!-- class="figure"-->
-     <!-- class="figure-caption"-->
-
-
-    <!--video iframe-->
-
-    <!--table thead tbody tr th td-->
-    <!-- class="table table-striped table-{顏色}"-->
-    <!--th scope = "row"-->
-
-
-
-    <!--form fieldset(legend) label select option optgroup-->
-
-    <!--input(text、number、radio、data、tel、password、checkbox)-->
-    <!--datalist(option)-->
-
-
-    <!--bootstrap-->
-
-    <!--<i> class="bi-"-->
-
-    <!-- class="col-md-6"-->
-
-    <!-- class="container container-md container-fluid"-->
-
-    <!-- class="row"-->
-     <!-- class="col-{數字}"-->
-      <!-- class="col-{斷點}-{數字}"-->
-    
-    <!-- class="row row-col-{數字}"-->
-
-    <!-- class="img-fluid img-thumbnail rounded"-->
-
-    <!--picture media ="(min-width: 1200px)"-->
-
-    <!-- class="col-md-6"-->
-
-    <!-- class="text-{顏色}"-->
-
-    <!-- class="bg-{顏色}"-->
-
-    <!-- class="text-start text-center text-end"-->
-     <!-- class="text-{斷點}-start"-->
-
-     <!-- class="text-truncate"-->
-
-     <!-- class="fs-{1-6} fw-bold fst-italic"-->
-
-     <!-- class="h-{25/50/75/100/auto} w-{25/50/75/100/auto}"-->
-
-     <!-- class="{m/p}{ /t/b/s/e/x/y}-{0-5/auto}}"-->
-
-     <!-- class="border border-{方向} border-{顏色} border-{1-5} rounded"-->
-
-     <!-- class="d-flex d-inline-flex"-->
-      <!-- class="d-flex flex-wrap flex-nowrap"-->
-       <!-- class = "d-flex" <class=" flex-grow-{0/1}">-->
-       <!-- class = "d-flex" <class="order-{數字}">-->
-
-       <!-- class = "d-flex" <class="justify-content-*">-->
-        <!-- class = "d-flex" <class="align-items-*">-->
-        <!-- class = "d-flex" <class="align-self-*">-->
-
-    <!-- class = "fixed-top padding-top"-->
-    <!-- class = "sticky-top"-->
-
-    <!-- class = "float-start float-end"-->
-     <!-- class = "clearfix"-->
-
-    <!-- class = "carousel slide" data-bs-ride="carousel"-->
-     <!--子元素 class = "carousel-item active"-->
-
-    <!-- a/button class = "btn btn-{顏色} "-->
-    <!-- class = "btn" data-bs-toggle="collapse" data-bs-target="#id"-->
-    <!-- a/button class = "btn " data-bs-toggle="modal" data-bs-target="#id"-->
-
-    <!--  class = "d-grid gap{數字}"-->
-    
-    <!-- class = "card"-->
-    <!-- class = "card-header"-->
-    <!-- class = "card-body"-->
-    <!-- class = "card-title"-->
-     <!-- class = "card-text"-->
-      <!-- class = "card-img-top"-->
-      <!-- class = "card-footer"-->
+        <!-- 畫庫操作區 -->
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <h3>畫庫</h3>
+            <button id="clearCanvas" class="btn btn-danger">清空畫庫</button>
+        </div>
+        <div id="canvas" class="mt-2">
+            <p class="text-muted">將標籤拖拽到這裡</p>
+        </div>
 
 
-    <!-- class = "toast"  data-bs-autohide="true" data-bs-delay="3000" -->
-    <!-- class = "toast-header"-->
+        <!-- 自訂 HTML -->
+        <div class="mt-4">
+            <h3>自訂 HTML</h3>
+            <div class="input-group mb-3">
+                <textarea id="customHTML" class="form-control" rows="2" placeholder="輸入你的 HTML 代碼"></textarea>
+                <button id="addCustomHTML" class="btn btn-primary">新增到拖拽項目</button>
+            </div>
+        </div>
+    </div>
 
-    <!-- class = "nav nav-pills"-->
-     <!-- 子元素 class = "nav-item"-->
-      <!-- 子元素a data-bs-toggle="pill" href="#id" aria-controls="id" aria-selected="true"-->
+    <!-- 程式碼欄位 -->
+    <div class="code-container" id="codeContainer">
+        <h5>畫庫程式碼</h5>
+        <pre id="codeDisplay" class="mt-2"></pre>
+    </div>
+
+    <script src="drag_and_drop.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
