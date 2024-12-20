@@ -26,22 +26,20 @@
                             <li><a class="dropdown-item" href="#" id="loadLinkTags">連結標籤</a></li>
                             <li><a class="dropdown-item" href="#" id="loadMediaTags">媒體標籤</a></li>
                             <li><a class="dropdown-item" href="#" id="loadTableTags">表格標籤</a></li>
+                            <li><a class="dropdown-item" href="#" id="loadFormTags">表單標籤</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="cssDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">CSS</a>
                         <ul class="dropdown-menu" aria-labelledby="cssDropdown">
-                            <li><a class="dropdown-item" href="#">選擇器</a></li>
-                            <li><a class="dropdown-item" href="#">盒模型</a></li>
-                            <li><a class="dropdown-item" href="#">動畫</a></li>
+                            <li><a class="dropdown-item" href="#" id="loadCssTags">選擇器</a></li>
+                            <li><a class="dropdown-item" href="#" id="loadCssFamilyTags">選擇器</a></li>
+  
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="bootstrapDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Bootstrap</a>
                         <ul class="dropdown-menu" aria-labelledby="bootstrapDropdown">
-                            <li><a class="dropdown-item" href="#">網格系統</a></li>
-                            <li><a class="dropdown-item" href="#">元件</a></li>
-                            <li><a class="dropdown-item" href="#">實用工具</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -49,9 +47,11 @@
         </div>
     </nav>
 
+
+    <div><form><fieldset><legend>123</legend></fieldset></form></div>
     <div class="container mt-5">
-        <h3 slot=>HTML 標籤拖拽工具</h3>
-        <p>將上方的 HTML 標籤拖到下方的畫庫來顯示效果。</p>
+        <h3>HTML 和 CSS 拖拽工具</h3>
+        <p>將上方的 HTML 或 CSS 標籤拖到下方的畫庫來顯示效果。</p>
 
         <!-- 可拖拽的 HTML 標籤 -->
         <div class="d-flex flex-wrap" id="dragItems">
@@ -78,13 +78,13 @@
             <h3>畫庫</h3>
             <button id="clearCanvas" class="btn btn-danger">清空畫庫</button>
         </div>
-        <div id="canvas" class="mt-2">
+        <div id="canvas" class="mt-2 border" style="min-height: 300px;">
             <p class="text-muted">將標籤拖拽到這裡</p>
         </div>
 
 
         <!-- 自訂 HTML -->
-        <div class="mt-4">
+        <div class="mt-4" id="customHtmlContainer">
             <h3>自訂 HTML</h3>
             <div class="input-group mb-3">
                 <textarea id="customHTML" class="form-control" rows="2" placeholder="輸入你的 HTML 代碼"></textarea>
@@ -96,7 +96,9 @@
     <!-- 程式碼欄位 -->
     <div class="code-container" id="codeContainer">
         <h5>畫庫程式碼</h5>
-        <pre id="codeDisplay" class="mt-2"></pre>
+        <pre id="codeDisplay" class="mt-2 p-3 border bg-light"></pre>
+        <h5 class="mt-4">CSS 規則</h5>
+        <pre id="cssDisplay" class="mt-2 p-3 border bg-light"></pre>
     </div>
 
     <script src="drag_and_drop.js"></script>

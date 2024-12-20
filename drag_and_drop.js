@@ -1,7 +1,81 @@
 const dragItemsContainer = document.getElementById('dragItems');
 const canvas = document.getElementById('canvas');
 const codeDisplay = document.getElementById('codeDisplay');
+const cssDisplay = document.getElementById('cssDisplay');
 
+
+
+// CSS 標籤
+const cssTags = `
+    <div class="drag-item" draggable="true" data-css="tag">標籤選擇器 (tag)</div>
+    <div class="drag-item" draggable="true" data-css="#id">ID選擇器 (#id)</div>
+    <div class="drag-item" draggable="true" data-css=".class">類別選擇器 (.class)</div>
+    <div class="drag-item" draggable="true" data-css="!important">!important</div>
+`;
+
+// CSS 親屬標籤
+const cssFamilyTags = `
+    <div class="drag-item" draggable="true" data-css="div > h1">子選擇器 (&gt;)</div>
+    <div class="drag-item" draggable="true" data-css="div h1">子孫選擇器 (space)</div>
+    <div class="drag-item" draggable="true" data-css="div + h1">相鄰兄弟選擇器 (+)</div>
+    <div class="drag-item" draggable="true" data-css="div ~ h1">全體兄弟選擇器 (~)</div>
+`;
+
+
+const cssRules = [];
+
+// 更新 CSS 顯示
+const updateCssDisplay = () => {
+    cssDisplay.textContent = cssRules.join('\n');
+};
+
+// 計算選擇器優先級
+const calculateCssSpecificity = (selector) => {
+    const ids = (selector.match(/#/g) || []).length; // ID 选择器
+    const classes = (selector.match(/(\.[\w-]+|\[[^\]]+\]|::?[\w-]+)/g) || []).length; // 类、属性选择器、伪类
+    const tags = (selector.match(/^[a-zA-Z]+|[ >+~][a-zA-Z]+/g) || []).length; // 标籤选择器和伪元素
+    return ids * 100 + classes * 10 + tags;
+};
+
+// 顯示選擇器的優先級
+const showCssSpecificity = (selector) => {
+    const specificity = calculateCssSpecificity(selector);
+    const specificityDisplay = document.createElement('p');
+    specificityDisplay.textContent = `選擇器: ${selector}，優先級: ${specificity}`;
+    canvas.appendChild(specificityDisplay);
+};
+
+// 清空畫庫功能
+const clearCanvas = () => {
+    canvas.innerHTML = '<p class="text-muted">將標籤拖拽到這裡</p>';
+    cssRules.length = 0;
+    updateCssDisplay();
+};
+
+// 清空畫庫功能增加親屬
+const clearCanvasFamily = () => {
+    canvas.innerHTML = '<div>\n        <h1>兒子-1</h1>\n        <section>\n            <h1>孫子</h1>\n            <section>\n                <h1>曾孫</h1>\n            </section>\n        </section>\n        <h1>兒子-2</h1>\n    </div>\n    <!-- <p>隔壁鄰居-2</p> -->\n    <h1>伯父</h1>\n    <h1>叔叔</h1>\n    <p>隔壁鄰居-1</p>';
+    cssRules.length = 0;
+    updateCssDisplay();
+};
+
+
+// 初始化畫庫預設標籤
+const loadCssTags = () => {
+    dragItemsContainer.innerHTML = cssTags;
+    addDragEvents();
+    clearCanvas(); // 清空畫庫
+    document.getElementById('customHtmlContainer').style.display = 'none'; // 隱藏自訂 HTML
+};
+
+const loadCssFamilyTags = () => {
+    dragItemsContainer.innerHTML = cssFamilyTags;
+    addDragEvents();
+    clearCanvasFamily(); // 清空畫庫功能增加親屬
+    document.getElementById('customHtmlContainer').style.display = 'none'; // 隱藏自訂 HTML
+};
+
+//跳轉首頁結構
 const defaultTags = `
     <div class="dropdown">
     <button class="btn btn-secondary dropdown-toggle" type="button" id="headingDropdown" data-bs-toggle="dropdown" aria-expanded="false">標題 (h1-h6)
@@ -20,7 +94,6 @@ const defaultTags = `
     <div class="drag-item" draggable="true" data-html="<ul><li>項目1</li><li>項目2</li></ul>">無序列表 (ul)</div>
     <div class="drag-item" draggable="true" data-html="<img src='https://via.placeholder.com/150' alt='範例圖片'>">圖片 (img)</div>
 `;
-
 
 // 風格與語氣標籤
 const styleTags = `
@@ -118,6 +191,11 @@ const tableTags = `
     <button id="configureTableButton" class="btn btn-success">設定表格屬性</button>
 `;
 
+// 表單標籤
+const formTags = `
+    <div class="drag-item" draggable="true" data-html='<form><select><option>預設選項</option></select></form>'>表單 (form)</div>
+    <button id="configureFormButton" class="btn btn-success">設定表單內容</button>
+`;
 
 // 顯示列表OL屬性
 const showOlForm = () => {
@@ -131,6 +209,7 @@ const showOlForm = () => {
     modal.style.backgroundColor = 'white';
     modal.style.padding = '20px';
     modal.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+    modal.style.width = '400px';
 
     modal.innerHTML = `
         <form id="olForm">
@@ -145,8 +224,8 @@ const showOlForm = () => {
                 <label class="form-check-label" for="olReversed">Reversed</label>
             </div>
 
-            <button type="button" id="applyOlAttributes" class="btn btn-primary mt-3">Apply Attributes</button>
-            <button type="button" id="closeOlForm" class="btn btn-secondary mt-3">Close</button>
+            <button type="button" id="applyOlAttributes" class="btn btn-primary mt-3">新增</button>
+            <button type="button" id="closeOlForm" class="btn btn-secondary mt-3">關閉</button>
         </form>
     `;
     document.body.appendChild(modal);
@@ -191,14 +270,15 @@ const showLiForm = () => {
     modal.style.backgroundColor = 'white';
     modal.style.padding = '20px';
     modal.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+    modal.style.width = '400px';
 
     modal.innerHTML = `
         <form id="liForm">
             <label for="liValue">LI Value:</label>
             <input type="number" id="liValue" name="value" placeholder="設定 LI 值" class="form-control">
 
-            <button type="button" id="applyLiAttributes" class="btn btn-primary mt-3">Apply Attributes</button>
-            <button type="button" id="closeLiForm" class="btn btn-secondary mt-3">Close</button>
+            <button type="button" id="applyLiAttributes" class="btn btn-primary mt-3">新增</button>
+            <button type="button" id="closeLiForm" class="btn btn-secondary mt-3">關閉</button>
         </form>
     `;
     document.body.appendChild(modal);
@@ -238,6 +318,7 @@ const showTableForm = () => {
     modal.style.backgroundColor = 'white';
     modal.style.padding = '20px';
     modal.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+    modal.style.width = '400px';
 
     modal.innerHTML = `
         <form id="tableForm">
@@ -253,8 +334,8 @@ const showTableForm = () => {
             <label for="rowspan">Rowspan (第一行):</label>
             <input type="number" id="rowspan" name="rowspan" value="2" class="form-control">
 
-            <button type="button" id="applyTableAttributes" class="btn btn-primary mt-3">Apply</button>
-            <button type="button" id="closeTableForm" class="btn btn-secondary mt-3">Close</button>
+            <button type="button" id="applyTableAttributes" class="btn btn-primary mt-3">新增</button>
+            <button type="button" id="closeTableForm" class="btn btn-secondary mt-3">關閉</button>
         </form>
     `;
     document.body.appendChild(modal);
@@ -316,39 +397,164 @@ const showTableForm = () => {
 };
 
 
+//顯示自訂表單標籤
+const showFormContentBuilder = () => {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'block';
+    modal.style.position = 'fixed';
+    modal.style.top = '50%';
+    modal.style.left = '50%';
+    modal.style.transform = 'translate(-50%, -50%)';
+    modal.style.backgroundColor = 'white';
+    modal.style.padding = '20px';
+    modal.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+    modal.style.width = '400px';
 
-// 調整畫布和內容的偏移量
-const adjustCanvasPosition = () => {
-    const navHeight = document.querySelector('nav').offsetHeight;
-    document.querySelector('.container').style.marginTop = `${navHeight + 20}px`;
-};
+    modal.innerHTML = `
+        <form id="formContentBuilder">
+            <label>選擇表單內部元素:</label>
+            <div>
+                <label><input type="checkbox" value="fieldset"> 外框 (fieldset)</label>
+            </div>
+            <div>
+                <label><input type="checkbox" value="legend"> 外框說明 (legend)</label>
+            </div>
+            <div>
+                <label><input type="checkbox" value="label"> 標籤 (label)</label>
+            </div>
+            <div>
+                <label><input type="checkbox" value="select"> 下拉選單 (select)</label>
+            </div>
+            <div>
+                <label><input type="checkbox" value="option"> 選項 (option)</label>
+            </div>
+            <div>
+                <label><input type="checkbox" value="optgroup"> 選項群組 (optgroup)</label>
+            </div>
+            <div>
+                <label><input type="checkbox" value="datalist"> 資料清單 (datalist)</label>
+            </div>
+            <div>
+                <label><input type="checkbox" value="input-text"> 輸入框 (text)</label>
+            </div>
+            <div>
+                <label><input type="checkbox" value="input-number"> 輸入框 (number)</label>
+            </div>
+            <div>
+                <label><input type="checkbox" value="input-radio"> 單選框 (radio)</label>
+            </div>
+            <div>
+                <label><input type="checkbox" value="input-date"> 日期輸入框 (date)</label>
+            </div>
+            <div>
+                <label><input type="checkbox" value="input-tel"> 電話輸入框 (tel)</label>
+            </div>
+            <div>
+                <label><input type="checkbox" value="input-password"> 密碼輸入框 (password)</label>
+            </div>
+            <div>
+                <label><input type="checkbox" value="input-checkbox"> 多選框 (checkbox)</label>
+            </div>
 
-// 初始調整
-adjustCanvasPosition();
-window.addEventListener('resize', adjustCanvasPosition);
+            <label for="additionalAttributes" class="mt-2">其他屬性 (適用於全部標籤):</label>
+            <input type="text" id="additionalAttributes" class="form-control" placeholder="例如: placeholder='輸入文字'">
 
-// 設定拖拽事件
-const addDragEvents = () => {
-    document.querySelectorAll('.drag-item').forEach(item => {
-        item.addEventListener('dragstart', e => {
-            e.dataTransfer.setData('text/html', item.getAttribute('data-html'));
+            <button type="button" id="addFormContentElements" class="btn btn-primary mt-3">新增</button>
+            <button type="button" id="closeFormContentBuilder" class="btn btn-secondary mt-3">關閉</button>
+        </form>
+    `;
+    document.body.appendChild(modal);
+
+    document.getElementById('addFormContentElements').addEventListener('click', () => {
+        const checkedElements = Array.from(modal.querySelectorAll('input[type=checkbox]:checked'));
+        const additionalAttributes = document.getElementById('additionalAttributes').value;
+
+        let formContent = '<form>';
+        let fieldsetContent = '';
+        let useFieldset = false;
+
+        checkedElements.forEach(checkbox => {
+            switch (checkbox.value) {
+                case 'fieldset':
+                    useFieldset = true;
+                    fieldsetContent += `<fieldset ${additionalAttributes} style="border: 1px solid black; padding: 10px;">
+                        <legend>外框說明</legend>`;
+                    break;
+                case 'legend':
+                    fieldsetContent += `<legend ${additionalAttributes}>外框說明</legend>`;
+                    break;
+                case 'label':
+                    fieldsetContent += `<label ${additionalAttributes}>標籤</label><br>`;
+                    break;
+                case 'select':
+                    fieldsetContent += `<select ${additionalAttributes}><option>預設選項</option></select><br>`;
+                    break;
+                case 'option':
+                    fieldsetContent += `<option ${additionalAttributes}>新選項</option>`;
+                    break;
+                case 'optgroup':
+                    fieldsetContent += `<optgroup ${additionalAttributes} label='群組'><option>選項1</option></optgroup>`;
+                    break;
+                case 'datalist':
+                    fieldsetContent += `<input list="exampleList" placeholder="選擇或輸入..."><datalist ${additionalAttributes} id='exampleList'><option value='選項一'></option><option value='選項二'></option></datalist><br>`;
+                    break;
+                case 'input-text':
+                    fieldsetContent += `<input type="text" ${additionalAttributes}><br>`;
+                    break;
+                case 'input-number':
+                    fieldsetContent += `<input type="number" ${additionalAttributes}><br>`;
+                    break;
+                case 'input-radio':
+                    fieldsetContent += `<input type="radio" ${additionalAttributes}><br>`;
+                    break;
+                case 'input-date':
+                    fieldsetContent += `<input type="date" ${additionalAttributes}><br>`;
+                    break;
+                case 'input-tel':
+                    fieldsetContent += `<input type="tel" ${additionalAttributes}><br>`;
+                    break;
+                case 'input-password':
+                    fieldsetContent += `<input type="password" ${additionalAttributes}><br>`;
+                    break;
+                case 'input-checkbox':
+                    fieldsetContent += `<input type="checkbox" ${additionalAttributes}><br>`;
+                    break;
+            }
         });
+
+        if (useFieldset) {
+            fieldsetContent += '</fieldset>';
+            formContent += fieldsetContent;
+        } else {
+            formContent += fieldsetContent;
+        }
+
+        formContent += '</form>';
+
+        const dragItem = document.createElement('div');
+        dragItem.className = 'drag-item';
+        dragItem.draggable = true;
+        dragItem.setAttribute('data-html', formContent);
+        dragItem.textContent = '自訂表單';
+
+        dragItemsContainer.appendChild(dragItem);
+        addDragEvents();
+
+        document.body.removeChild(modal);
+    });
+
+    document.getElementById('closeFormContentBuilder').addEventListener('click', () => {
+        document.body.removeChild(modal);
     });
 };
-
-// 載入預設標籤
-const loadDefaultTags = () => {
-    dragItemsContainer.innerHTML = defaultTags;
-    addDragEvents();
-};
-
-
 
 
 // 點擊「風格與語氣標籤」
 document.getElementById('loadStyleTags').addEventListener('click', () => {
     dragItemsContainer.innerHTML = styleTags;
     addDragEvents();
+    document.getElementById('customHtmlContainer').style.display = 'block';
 });
 
 
@@ -357,6 +563,7 @@ document.getElementById('loadStyleTags').addEventListener('click', () => {
 document.getElementById('loadStructureTags').addEventListener('click', () => {
     dragItemsContainer.innerHTML = structureTags;
     addDragEvents();
+    document.getElementById('customHtmlContainer').style.display = 'block';
 });
 
 
@@ -367,18 +574,21 @@ document.getElementById('loadListTags').addEventListener('click', () => {
 
     document.getElementById('configureOlButton').addEventListener('click', showOlForm);
     document.getElementById('configureLiButton').addEventListener('click', showLiForm);
+    document.getElementById('customHtmlContainer').style.display = 'block';
 });
 
 // 點擊「連結標籤」
 document.getElementById('loadLinkTags').addEventListener('click', () => {
     dragItemsContainer.innerHTML = linkTags;
     addDragEvents();
+    document.getElementById('customHtmlContainer').style.display = 'block';
 });
 
 // 點擊「媒體標籤」
 document.getElementById('loadMediaTags').addEventListener('click', () => {
     dragItemsContainer.innerHTML = mediaTags;
     addDragEvents();
+    document.getElementById('customHtmlContainer').style.display = 'block';
 });
 
 
@@ -388,34 +598,32 @@ document.getElementById('loadTableTags').addEventListener('click', () => {
     addDragEvents();
 
     document.getElementById('configureTableButton').addEventListener('click', showTableForm);
+    document.getElementById('customHtmlContainer').style.display = 'block';
 });
 
+// 點擊「表單標籤」
+document.getElementById('loadFormTags').addEventListener('click', () => {
+    dragItemsContainer.innerHTML = formTags;
+    addDragEvents();
 
-// 點擊「HTML 工具」時，回到預設標籤
-document.querySelector('.navbar-brand').addEventListener('click', (e) => {
-    e.preventDefault(); // 防止頁面跳轉
-    loadDefaultTags();
+    document.getElementById('configureFormButton').addEventListener('click', showFormContentBuilder);
+    document.getElementById('customHtmlContainer').style.display = 'block';
 });
 
-addDragEvents();
+// 更新畫布程式碼顯示
+function updateCodeDisplay() {
+    const content = Array.from(canvas.children)
+        .filter(child => !(child.tagName === 'P' && child.classList.contains('text-muted')))
+        .map(child => child.outerHTML)
+        .join('\n');
+    codeDisplay.textContent = content;
+}
 
-
-
-
-
-// 畫庫拖放事件
-canvas.addEventListener('dragover', e => e.preventDefault());
-canvas.addEventListener('drop', e => {
-    e.preventDefault();
-    const html = e.dataTransfer.getData('text/html');
-    canvas.insertAdjacentHTML('beforeend', html);
-    updateCodeDisplay();
-});
-
-// 清空畫庫功能
+// 清空畫布功能
 document.getElementById('clearCanvas').addEventListener('click', () => {
     canvas.innerHTML = '<p class="text-muted">將標籤拖拽到這裡</p>';
-    updateCodeDisplay();
+    cssRules.length = 0;
+    updateCssDisplay();
 });
 
 // 自訂 HTML 新增功能
@@ -435,16 +643,85 @@ document.getElementById('addCustomHTML').addEventListener('click', () => {
     }
 });
 
-// 顯示畫庫中的程式碼
-function updateCodeDisplay() {
-    const content = Array.from(canvas.children)
-        .filter(child => !(child.tagName === 'P' && child.classList.contains('text-muted')))
-        .map(child => child.outerHTML)
-        .join('\n');
-    codeDisplay.textContent = content;
-}
+// 拖放事件
+canvas.addEventListener('dragover', e => e.preventDefault());
+canvas.addEventListener('drop', e => {
+    e.preventDefault();
+    const cssData = e.dataTransfer.getData('text/css');
+    const htmlData = e.dataTransfer.getData('text/html');
+
+    if (cssData) {
+        // 將新的 CSS 規則插入到畫庫內部
+        const styleTag = document.createElement('style');
+        if (cssData === 'div > h1') {
+            styleTag.textContent = '#canvas > div > h1 { background-color: red; }'; // 僅影響直接子元素
+        } else if (cssData === 'div h1') {
+            styleTag.textContent = '#canvas div h1 { background-color: orange; }'; // 子孫選擇器
+        } else if (cssData === 'div + h1') {
+            styleTag.textContent = '#canvas div + h1 { background-color: green; }'; // 相鄰兄弟
+        } else if (cssData === 'div ~ h1') {
+            styleTag.textContent = '#canvas div ~ h1 { background-color: blue; }'; // 全體兄弟
+        }
+        canvas.appendChild(styleTag);
+
+        // 更新 CSS 顯示區域
+        cssRules.push(cssData);
+        updateCssDisplay();
+    }
+
+    if (htmlData) {
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = htmlData;
+        const content = wrapper.firstElementChild;
+        if (content) {
+            canvas.appendChild(content);
+        }
+        updateCodeDisplay();
+    }
+});
+
+// 點擊CSS「選擇器標籤」
+document.getElementById('loadCssTags').addEventListener('click', loadCssTags);
+// 點擊清空畫庫按鈕
+document.getElementById('clearCanvas').addEventListener('click', clearCanvas);
+
+// 點擊CSS「親屬選擇器標籤」
+document.getElementById('loadCssFamilyTags').addEventListener('click', loadCssFamilyTags);
+
+
+// 點擊「HTML 工具」時，回到預設標籤
+document.querySelector('.navbar-brand').addEventListener('click', (e) => {
+    e.preventDefault(); // 防止頁面跳轉
+    dragItemsContainer.innerHTML = defaultTags;
+    addDragEvents();
+});
+
+// 初始調整
+const adjustCanvasPosition = () => {
+    const navHeight = document.querySelector('nav').offsetHeight;
+    document.querySelector('.container').style.marginTop = `${navHeight + 20}px`;
+};
+adjustCanvasPosition();
+window.addEventListener('resize', adjustCanvasPosition);
+
+// 設定拖拽事件
+const addDragEvents = () => {
+    document.querySelectorAll('.drag-item').forEach(item => {
+        item.addEventListener('dragstart', e => {
+            const cssData = item.getAttribute('data-css');
+            const htmlData = item.getAttribute('data-html');
+            if (cssData) {
+                e.dataTransfer.setData('text/css', cssData);
+            }
+            if (htmlData) {
+                e.dataTransfer.setData('text/html', htmlData);
+            }
+        });
+    });
+};
+
+addDragEvents();
 
 document.getElementById('showCode').addEventListener('click', updateCodeDisplay);
-
 // 初始化預設標籤
 loadDefaultTags();
