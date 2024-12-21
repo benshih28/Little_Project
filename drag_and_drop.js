@@ -29,6 +29,15 @@ const cssPseudoClassTags = `
     <div class="drag-item" draggable="true" data-css=":active">:active</div>
 `;
 
+// CSS 虛擬類別結構相關
+const cssStructurePseudoClassTags = `
+    <div class="drag-item" draggable="true" data-css=":first-child">:first-child</div>
+    <div class="drag-item" draggable="true" data-css=":last-child">:last-child</div>
+    <div class="drag-item" draggable="true" data-css=":nth-child(n)">:nth-child(n)</div>
+    <div class="drag-item" draggable="true" data-css=":nth-of-type(n)">:nth-of-type(n)</div>
+    <div class="drag-item" draggable="true" data-css=":not(selector)">:not(selector)</div>
+`;
+
 const cssRules = [];
 
 // 更新 CSS 顯示
@@ -74,19 +83,19 @@ const clearCanvas = () => {
 const clearCanvasFamily = () => {
     canvas.innerHTML = `
         <div>
-            <h1>兒子-1</h1>
-            <section>
-                <h1>孫子</h1>
-                <section>
-                    <h1>曾孫</h1>
-                </section>
-            </section>
-            <h1>兒子-2</h1>
-        </div>
-        <h1>伯父</h1>
-        <h1>叔叔</h1>
-        <p>隔壁鄰居-1</p>
-    `;
+    <h1>兒子-1</h1>
+    <section>
+        <h1>孫子</h1>
+        <section>
+            <h1>曾孫</h1>
+        </section>
+    </section>
+    <h1>兒子-2</h1>
+</div>
+<h1>伯父</h1>
+<h1>叔叔</h1>
+<p>隔壁鄰居-1</p>
+    `.trim(); ;
 
     // 移除所有應用的樣式
     const existingStyles = document.querySelectorAll('style');
@@ -110,6 +119,27 @@ const clearCanvasPseudoClass = () => {
     updateCodeDisplayCSS_HTML(); // 更新畫布程式碼
 };
 
+
+// 清空畫庫功能增加結構相關虛擬類別
+const clearCanvasStructurePseudoClass = () => {
+    canvas.innerHTML = `
+<div class="containerPseudoClass">
+    <p>Paragraph 1</p>
+    <span>Span 1</span>
+    <p>Paragraph 2</p>
+    <span class="exclude">Span 2</span>
+    <p>Paragraph 3</p>
+</div>
+    `.trim(); ;
+
+    // 移除所有應用的樣式
+    const existingStyles = document.querySelectorAll('style');
+    existingStyles.forEach(styleTag => styleTag.remove());
+    updateCssDisplay();
+    updateCodeDisplayCSS_HTML();
+};
+
+
 // 初始化畫庫（CSS 第一項）
 const loadCssTags = () => {
     dragItemsContainer.innerHTML = cssTags; // 加載拖曳標籤
@@ -119,7 +149,7 @@ const loadCssTags = () => {
     document.getElementById('customHtmlContainer').style.display = 'none'; // 隱藏自訂 HTML
 };
 
-// 初始化畫庫（CSS 第二項）
+// 初始化畫庫預設標籤畫庫改親屬（CSS 第二項）
 const loadCssFamilyTags = () => {
     dragItemsContainer.innerHTML = cssFamilyTags; // 加載拖曳標籤
     addDragEvents(); // 添加拖曳事件
@@ -128,12 +158,22 @@ const loadCssFamilyTags = () => {
     document.getElementById('customHtmlContainer').style.display = 'none'; // 隱藏自訂 HTML
 };
 
-// 初始化畫庫（CSS 第三項）
+// 初始化畫庫預設標籤畫庫改虛擬標籤超連結（CSS 第三項）
 const loadCssPseudoClassTags = () => {
     dragItemsContainer.innerHTML = cssPseudoClassTags; // 加載拖曳標籤
     addDragEvents(); // 添加拖曳事件
     resetCanvasAndCss(); // 重置畫布與 CSS
     clearCanvasPseudoClass(); // 清空畫布並加載虛擬標籤內容
+    document.getElementById('customHtmlContainer').style.display = 'none'; // 隱藏自訂 HTML
+};
+
+
+// 初始化畫庫預設標籤畫庫改結構相關虛擬類別（CSS 第四項）
+const loadCssStructurePseudoClassTags = () => {
+    dragItemsContainer.innerHTML = cssStructurePseudoClassTags;
+    addDragEvents();
+    resetCanvasAndCss();
+    clearCanvasStructurePseudoClass(); // 清空畫庫增加結構相關虛擬類別
     document.getElementById('customHtmlContainer').style.display = 'none'; // 隱藏自訂 HTML
 };
 
@@ -749,6 +789,26 @@ canvas.addEventListener('drop', e => {
             styleTag.textContent = '#canvas > p > a:active { color: black; }'; // :active
             const newHtml = '<p><a href="https://www.w3schools.com/css/css_pseudo_classes.asp" target="_blank">設定超連結點選連結當下的顏色</a></p>';
             canvas.innerHTML += newHtml;
+        } else if(cssData === ':first-child') {
+            styleTag.textContent = '.containerPseudoClass :first-child { color: red; }'; // 將第一個子元素設為紅色 
+            const newHtml = '<p>將第一個子元素設為紅色 </p>';
+            canvas.innerHTML += newHtml;
+        } else if (cssData === ':last-child') {
+            styleTag.textContent = '.containerPseudoClass :last-child { color: blue; }'; // 將最後一個子元素設為藍色
+            const newHtml = '<p>將最後一個子元素設為藍色 </p>';
+            canvas.innerHTML += newHtml; 
+        } else if (cssData === ':nth-child(n)') {
+            styleTag.textContent = '.containerPseudoClass :nth-child(2) { background-color: lightgreen; }'; // 將第二個子元素背景設為淺綠色
+            const newHtml = '<p>將第二個子元素背景設為淺綠色 </p>';
+            canvas.innerHTML += newHtml;  
+        } else if (cssData === ':nth-of-type(n)') {
+            styleTag.textContent = '.containerPseudoClass p:nth-of-type(2) { font-weight: bold; }';// 將第二個 <p> 設為加粗 *
+            const newHtml = '<p>參數設2 ，將第二個 &lt;p&gt; 設為加粗 </p>';
+            canvas.innerHTML += newHtml; 
+        } else if (cssData === ':not(selector)') {
+            styleTag.textContent = '.containerPseudoClass :not(.exclude) { text-decoration: underline; }';// 不帶有 .exclude 類的元素加下劃線 
+            const newHtml = '<p>參數設.exclude ，將不帶有 .exclude 類的元素加下劃線 ';
+            canvas.innerHTML += newHtml; 
         }
 
 
@@ -797,6 +857,8 @@ document.getElementById('loadCssFamilyTags').addEventListener('click', loadCssFa
 // 點擊CSS「虛擬類別標籤」
 document.getElementById('loadCssPseudoClassTags').addEventListener('click', loadCssPseudoClassTags);
 
+// 點擊CSS「結構相關虛擬類別標籤」
+document.getElementById('loadCssStructurePseudoClassTags').addEventListener('click', loadCssStructurePseudoClassTags);
 
 // 點擊「HTML 工具」時，回到預設標籤
 document.querySelector('.navbar-brand').addEventListener('click', (e) => {
