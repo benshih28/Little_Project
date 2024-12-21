@@ -5,7 +5,7 @@ const cssDisplay = document.getElementById('cssDisplay');
 
 
 
-// CSS 標籤
+// CSS 選擇器標籤
 const cssTags = `
     <div class="drag-item" draggable="true" data-css="tag">標籤選擇器 (tag)</div>
     <div class="drag-item" draggable="true" data-css="#id">ID選擇器 (#id)</div>
@@ -21,6 +21,13 @@ const cssFamilyTags = `
     <div class="drag-item" draggable="true" data-css="div ~ h1">全體兄弟選擇器 (~)</div>
 `;
 
+// CSS 虛擬類別
+const cssPseudoClassTags = `
+    <div class="drag-item" draggable="true" data-css=":link">:link</div>
+    <div class="drag-item" draggable="true" data-css=":visited">:visited</div>
+    <div class="drag-item" draggable="true" data-css=":hover">:hover</div>
+    <div class="drag-item" draggable="true" data-css=":active">:active</div>
+`;
 
 const cssRules = [];
 
@@ -45,33 +52,88 @@ const showCssSpecificity = (selector) => {
     canvas.appendChild(specificityDisplay);
 };
 
-// 清空畫庫功能
+// 清空畫布並初始化
+const resetCanvasAndCss = () => {
+    canvas.innerHTML = ''; // 清空畫布內容
+    cssRules.length = 0; // 清空 CSS 規則陣列
+    updateCssDisplay(); // 更新 CSS 顯示
+};
+
+// 清空畫布功能（預設）
 const clearCanvas = () => {
     canvas.innerHTML = '<p class="text-muted">將標籤拖拽到這裡</p>';
     cssRules.length = 0;
     updateCssDisplay();
+
+    // 移除所有應用的樣式
+    const existingStyles = document.querySelectorAll('style');
+    existingStyles.forEach(styleTag => styleTag.remove());
 };
 
-// 清空畫庫功能增加親屬
+// 清空畫布功能（親屬結構）
 const clearCanvasFamily = () => {
-    canvas.innerHTML = '<div>\n        <h1>兒子-1</h1>\n        <section>\n            <h1>孫子</h1>\n            <section>\n                <h1>曾孫</h1>\n            </section>\n        </section>\n        <h1>兒子-2</h1>\n    </div>\n    <!-- <p>隔壁鄰居-2</p> -->\n    <h1>伯父</h1>\n    <h1>叔叔</h1>\n    <p>隔壁鄰居-1</p>';
+    canvas.innerHTML = `
+        <div>
+            <h1>兒子-1</h1>
+            <section>
+                <h1>孫子</h1>
+                <section>
+                    <h1>曾孫</h1>
+                </section>
+            </section>
+            <h1>兒子-2</h1>
+        </div>
+        <h1>伯父</h1>
+        <h1>叔叔</h1>
+        <p>隔壁鄰居-1</p>
+    `;
+
+    // 移除所有應用的樣式
+    const existingStyles = document.querySelectorAll('style');
+    existingStyles.forEach(styleTag => styleTag.remove());
+
     cssRules.length = 0;
     updateCssDisplay();
+    updateCodeDisplayCSS_HTML(); // 更新畫布程式碼
 };
 
+// 清空畫布功能（虛擬標籤）
+const clearCanvasPseudoClass = () => {
+    canvas.innerHTML = '<p><a href="https://www.w3schools.com/css/css_pseudo_classes.asp" target="_blank">CSS Pseudo-classes</a></p>';
+    cssRules.length = 0;
 
-// 初始化畫庫預設標籤
+
+    // 移除所有應用的樣式
+    const existingStyles = document.querySelectorAll('style');
+    existingStyles.forEach(styleTag => styleTag.remove());
+    updateCssDisplay();
+    updateCodeDisplayCSS_HTML(); // 更新畫布程式碼
+};
+
+// 初始化畫庫（CSS 第一項）
 const loadCssTags = () => {
-    dragItemsContainer.innerHTML = cssTags;
-    addDragEvents();
-    clearCanvas(); // 清空畫庫
+    dragItemsContainer.innerHTML = cssTags; // 加載拖曳標籤
+    addDragEvents(); // 添加拖曳事件
+    resetCanvasAndCss(); // 重置畫布與 CSS
+    clearCanvas(); // 清空畫布（預設）
     document.getElementById('customHtmlContainer').style.display = 'none'; // 隱藏自訂 HTML
 };
 
+// 初始化畫庫（CSS 第二項）
 const loadCssFamilyTags = () => {
-    dragItemsContainer.innerHTML = cssFamilyTags;
-    addDragEvents();
-    clearCanvasFamily(); // 清空畫庫功能增加親屬
+    dragItemsContainer.innerHTML = cssFamilyTags; // 加載拖曳標籤
+    addDragEvents(); // 添加拖曳事件
+    resetCanvasAndCss(); // 重置畫布與 CSS
+    clearCanvasFamily(); // 清空畫布並加載親屬結構
+    document.getElementById('customHtmlContainer').style.display = 'none'; // 隱藏自訂 HTML
+};
+
+// 初始化畫庫（CSS 第三項）
+const loadCssPseudoClassTags = () => {
+    dragItemsContainer.innerHTML = cssPseudoClassTags; // 加載拖曳標籤
+    addDragEvents(); // 添加拖曳事件
+    resetCanvasAndCss(); // 重置畫布與 CSS
+    clearCanvasPseudoClass(); // 清空畫布並加載虛擬標籤內容
     document.getElementById('customHtmlContainer').style.display = 'none'; // 隱藏自訂 HTML
 };
 
@@ -619,6 +681,15 @@ function updateCodeDisplay() {
     codeDisplay.textContent = content;
 }
 
+// 更新畫布程式碼顯示CSS預設HTML
+function updateCodeDisplayCSS_HTML() {
+    const content = canvas.innerHTML
+        .replace(/></g, '>\n<') // 格式化 HTML，顯示巢狀結構
+        .trim();
+    codeDisplay.textContent = content;
+}
+
+
 // 清空畫布功能
 document.getElementById('clearCanvas').addEventListener('click', () => {
     canvas.innerHTML = '<p class="text-muted">將標籤拖拽到這裡</p>';
@@ -650,23 +721,58 @@ canvas.addEventListener('drop', e => {
     const cssData = e.dataTransfer.getData('text/css');
     const htmlData = e.dataTransfer.getData('text/html');
 
+    const isCssFirstSection = dragItemsContainer.innerHTML.includes('標籤選擇器 (tag)'); // 判斷當前是不是CSS第一項
+
     if (cssData) {
-        // 將新的 CSS 規則插入到畫庫內部
         const styleTag = document.createElement('style');
         if (cssData === 'div > h1') {
-            styleTag.textContent = '#canvas > div > h1 { background-color: red; }'; // 僅影響直接子元素
+            styleTag.textContent = '#canvas > div > h1 { background-color: red; }'; // 子選擇器
         } else if (cssData === 'div h1') {
             styleTag.textContent = '#canvas div h1 { background-color: orange; }'; // 子孫選擇器
         } else if (cssData === 'div + h1') {
-            styleTag.textContent = '#canvas div + h1 { background-color: green; }'; // 相鄰兄弟
+            styleTag.textContent = '#canvas div + h1 { background-color: green; }'; // 相鄰兄弟選擇器
         } else if (cssData === 'div ~ h1') {
-            styleTag.textContent = '#canvas div ~ h1 { background-color: blue; }'; // 全體兄弟
+            styleTag.textContent = '#canvas div ~ h1 { background-color: blue; }'; // 全體兄弟選擇器
+        } else if (cssData === ':link') {
+            styleTag.textContent = '#canvas > p > a:link { color: yellowgreen; }'; // :link
+            const newHtml = '<p><a href="https://www.w3schools.com/css/css_pseudo_classes.asp" target="_blank">設定超連結未連結時的顏色</a></p>';
+            canvas.innerHTML += newHtml;
+        } else if (cssData === ':visited') {
+            styleTag.textContent = '#canvas > p > a:visited { color: lightcoral; }'; // :visited
+            const newHtml = '<p><a href="https://www.w3schools.com/css/css_pseudo_classes.asp" target="_blank">設定超連結已連結過的顏色</a></p>';
+            canvas.innerHTML += newHtml;
+        } else if (cssData === ':hover') {
+            styleTag.textContent = '#canvas > p > a:hover { color: lightskyblue; }'; // :hover
+            const newHtml = '<p><a href="https://www.w3schools.com/css/css_pseudo_classes.asp" target="_blank">設定滑鼠移至連結上方時的顏色</a></p>';
+            canvas.innerHTML += newHtml;
+        } else if (cssData === ':active') {
+            styleTag.textContent = '#canvas > p > a:active { color: black; }'; // :active
+            const newHtml = '<p><a href="https://www.w3schools.com/css/css_pseudo_classes.asp" target="_blank">設定超連結點選連結當下的顏色</a></p>';
+            canvas.innerHTML += newHtml;
         }
-        canvas.appendChild(styleTag);
 
-        // 更新 CSS 顯示區域
-        cssRules.push(cssData);
-        updateCssDisplay();
+
+        // 如果是CSS第一項，顯示選擇器優先級
+        if (isCssFirstSection) {
+            if (cssData === 'tag') {
+                styleTag.textContent = 'p { color: green; }';
+            } else if (cssData === '#id') {
+                styleTag.textContent = '#example-id { color: blue; }';
+            } else if (cssData === '.class') {
+                styleTag.textContent = '.example-class { color: orange; }';
+            } else if (cssData === '!important') {
+                styleTag.textContent = 'p { color: red !important; }';
+            }
+
+            // 計算並顯示選擇器優先級
+            showCssSpecificity(cssData);
+        }
+
+        if (styleTag.textContent) {
+            document.head.appendChild(styleTag);
+            cssRules.push(styleTag.textContent);
+            updateCssDisplay();
+        }
     }
 
     if (htmlData) {
@@ -687,6 +793,9 @@ document.getElementById('clearCanvas').addEventListener('click', clearCanvas);
 
 // 點擊CSS「親屬選擇器標籤」
 document.getElementById('loadCssFamilyTags').addEventListener('click', loadCssFamilyTags);
+
+// 點擊CSS「虛擬類別標籤」
+document.getElementById('loadCssPseudoClassTags').addEventListener('click', loadCssPseudoClassTags);
 
 
 // 點擊「HTML 工具」時，回到預設標籤
@@ -722,6 +831,6 @@ const addDragEvents = () => {
 
 addDragEvents();
 
-document.getElementById('showCode').addEventListener('click', updateCodeDisplay);
+document.getElementById('clearCanvas').addEventListener('click', updateCodeDisplay);
 // 初始化預設標籤
 loadDefaultTags();
