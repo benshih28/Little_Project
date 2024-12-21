@@ -37,7 +37,15 @@ const cssStructurePseudoClassTags = `
     <div class="drag-item" draggable="true" data-css=":nth-of-type(n)">:nth-of-type(n)</div>
     <div class="drag-item" draggable="true" data-css=":not(selector)">:not(selector)</div>
 `;
-
+//CSS 虛擬類別選擇器
+const cssAttributePseudoClassTags = `
+    <div class="drag-item" draggable="true" data-css="::before">::before</div>
+    <div class="drag-item" draggable="true" data-css="::after">::after</div>
+    <div class="drag-item" draggable="true" data-css="^=">^= 選擇器</div>
+    <div class="drag-item" draggable="true" data-css="*=">*= 選擇器</div>
+    <div class="drag-item" draggable="true" data-css="$=">$= 選擇器</div>
+    <div class="drag-item" draggable="true" data-css="[]">[] 完全匹配選擇器</div>
+`;
 const cssRules = [];
 
 // 更新 CSS 顯示
@@ -95,7 +103,7 @@ const clearCanvasFamily = () => {
 <h1>伯父</h1>
 <h1>叔叔</h1>
 <p>隔壁鄰居-1</p>
-    `.trim(); ;
+    `;
 
     // 移除所有應用的樣式
     const existingStyles = document.querySelectorAll('style');
@@ -109,7 +117,7 @@ const clearCanvasFamily = () => {
 // 清空畫布功能（虛擬標籤）
 const clearCanvasPseudoClass = () => {
     canvas.innerHTML = '<p><a href="https://www.w3schools.com/css/css_pseudo_classes.asp" target="_blank">CSS Pseudo-classes</a></p>';
-    cssRules.length = 0;
+    cssRules.length = 0;// 清空 CSS 規則
 
 
     // 移除所有應用的樣式
@@ -130,13 +138,27 @@ const clearCanvasStructurePseudoClass = () => {
     <span class="exclude">Span 2</span>
     <p>Paragraph 3</p>
 </div>
-    `.trim(); ;
-
+    `;
+    cssRules.length = 0;// 清空 CSS 規則
     // 移除所有應用的樣式
     const existingStyles = document.querySelectorAll('style');
     existingStyles.forEach(styleTag => styleTag.remove());
     updateCssDisplay();
     updateCodeDisplayCSS_HTML();
+};
+
+const clearCanvasAttributePseudoClass = () => {
+    canvas.innerHTML = `
+<div class="container">
+    <p id="intro" data-info="start">Introduction</p>
+    <p class="content" data-info="middle">Main Content</p>
+    <p class="content" data-info="end">Conclusion</p>
+    <a href="https://example.com" class="link" data-category="external">Visit Example</a>
+</div>
+    `;
+    cssRules.length = 0; // 清空 CSS 規則
+    updateCssDisplay(); // 更新 CSS 顯示
+    updateCodeDisplayCSS_HTML(); // 更新畫庫程式碼顯示
 };
 
 
@@ -175,6 +197,15 @@ const loadCssStructurePseudoClassTags = () => {
     resetCanvasAndCss();
     clearCanvasStructurePseudoClass(); // 清空畫庫增加結構相關虛擬類別
     document.getElementById('customHtmlContainer').style.display = 'none'; // 隱藏自訂 HTML
+};
+
+// 初始化畫庫預設標籤畫庫改虛擬類別選擇器（CSS 第五項）
+const loadCssAttributePseudoClassTags = () => {
+    dragItemsContainer.innerHTML = cssAttributePseudoClassTags; // 更新可拖曳標籤
+    addDragEvents(); // 設置拖曳事件
+    resetCanvasAndCss(); // 重置畫庫和 CSS
+    clearCanvasAttributePseudoClass(); // 設置畫庫的預設結構
+    document.getElementById('customHtmlContainer').style.display = 'none'; // 隱藏自訂 HTML 區域
 };
 
 //跳轉首頁結構
@@ -807,7 +838,31 @@ canvas.addEventListener('drop', e => {
             canvas.innerHTML += newHtml; 
         } else if (cssData === ':not(selector)') {
             styleTag.textContent = '.containerPseudoClass :not(.exclude) { text-decoration: underline; }';// 不帶有 .exclude 類的元素加下劃線 
-            const newHtml = '<p>參數設.exclude ，將不帶有 .exclude 類的元素加下劃線 ';
+            const newHtml = '<p>參數設.exclude ，將不帶有 .exclude 類的元素加下劃線</p>';
+            canvas.innerHTML += newHtml; 
+        }else if (cssData === '::before') {
+            styleTag.textContent = '.container p::before { content: "• "; color: orange; }'; //在段落前添加內容
+            const newHtml = '<p>在段落前添加橙色圓點</p>';
+            canvas.innerHTML += newHtml; 
+        } else if (cssData === '::after') {
+            styleTag.textContent = '.container p::after { content: " (end)"; color: gray; }'; //在段落後添加結束標記
+            const newHtml = '<p>在段落後添加灰色結尾</p>';
+            canvas.innerHTML += newHtml; 
+        } else if (cssData === '^=') {
+            styleTag.textContent = '[data-info^="start"] { font-weight: bold; }'; // 選擇屬性值開頭為 "start" 的元素
+            const newHtml = '<p>選擇屬性值開頭為 "設定內容" 的元素加粗</p>';
+            canvas.innerHTML += newHtml; 
+        } else if (cssData === '*=') {
+            styleTag.textContent = '[data-info*="middle"] { background-color: lightyellow; }';// 選擇屬性值包含 "middle" 的元素
+            const newHtml = '<p>選擇屬性值包含 "設定內容" 的元素背景設為淺黃色</p>';
+            canvas.innerHTML += newHtml; 
+        } else if (cssData === '$=') {
+            styleTag.textContent = '[data-info$="end"] { color: green; }'; //選擇屬性值結尾為 "end" 的元素
+            const newHtml = '<p>選擇屬性值結尾為 "設定內容" 的元素文字顏色設為綠色</p>';
+            canvas.innerHTML += newHtml; 
+        } else if (cssData === '[]') {
+            styleTag.textContent = '[data-category="external"] { text-decoration: underline; color: blue; }'; // 完全匹配 data-category="external" 
+            const newHtml = '<p>完全匹配屬性值添加下劃線，文字顏色設為藍色 </p>';
             canvas.innerHTML += newHtml; 
         }
 
@@ -859,6 +914,9 @@ document.getElementById('loadCssPseudoClassTags').addEventListener('click', load
 
 // 點擊CSS「結構相關虛擬類別標籤」
 document.getElementById('loadCssStructurePseudoClassTags').addEventListener('click', loadCssStructurePseudoClassTags);
+
+//點擊CSS「虛擬類別選擇器標籤」
+document.getElementById('loadCssAttributePseudoClassTags').addEventListener('click', loadCssAttributePseudoClassTags);
 
 // 點擊「HTML 工具」時，回到預設標籤
 document.querySelector('.navbar-brand').addEventListener('click', (e) => {
