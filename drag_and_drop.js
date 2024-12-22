@@ -155,6 +155,7 @@ const clearCanvasStructurePseudoClass = () => {
     updateCodeDisplayCSS_HTML();
 };
 
+// 清空畫庫功能增加虛擬類別
 const clearCanvasAttributePseudoClass = () => {
     canvas.innerHTML = `
 <div class="container">
@@ -1032,25 +1033,44 @@ canvas.addEventListener('drop', e => {
     }
 });
 
-// 點擊CSS「選擇器標籤」
-document.getElementById('loadCssTags').addEventListener('click', loadCssTags);
-// 點擊清空畫庫按鈕
-document.getElementById('clearCanvas').addEventListener('click', clearCanvas);
 
-// 點擊CSS「親屬選擇器標籤」
-document.getElementById('loadCssFamilyTags').addEventListener('click', loadCssFamilyTags);
+// 綁定按鈕與事件處理函數
+const buttonHandlers = [
+    { id: 'loadCssTags', handler: loadCssTags },
+    { id: 'clearCanvas', handler: clearCanvas },
+    { id: 'loadCssFamilyTags', handler: loadCssFamilyTags },
+    { id: 'loadCssPseudoClassTags', handler: loadCssPseudoClassTags },
+    { id: 'loadCssStructurePseudoClassTags', handler: loadCssStructurePseudoClassTags },
+    { id: 'loadCssAttributePseudoClassTags', handler: loadCssAttributePseudoClassTags },
+    { id: 'loadCssBorderTags', handler: loadCssBorderTags }
+];
 
-// 點擊CSS「虛擬類別標籤」
-document.getElementById('loadCssPseudoClassTags').addEventListener('click', loadCssPseudoClassTags);
+buttonHandlers.forEach(({ id, handler }) => {
+    const button = document.getElementById(id);
+    if (button) {
+        button.addEventListener('click', handler);
+    }
+});
 
-// 點擊CSS「結構相關虛擬類別標籤」
-document.getElementById('loadCssStructurePseudoClassTags').addEventListener('click', loadCssStructurePseudoClassTags);
+// // 點擊CSS「選擇器標籤」
+// document.getElementById('loadCssTags').addEventListener('click', loadCssTags);
+// // 點擊清空畫庫按鈕
+// document.getElementById('clearCanvas').addEventListener('click', clearCanvas);
 
-//點擊CSS「虛擬類別選擇器標籤」
-document.getElementById('loadCssAttributePseudoClassTags').addEventListener('click', loadCssAttributePseudoClassTags);
+// // 點擊CSS「親屬選擇器標籤」
+// document.getElementById('loadCssFamilyTags').addEventListener('click', loadCssFamilyTags);
 
-//點擊CSS「虛擬類別選擇器標籤」
-document.getElementById('loadCssBorderTags').addEventListener('click', loadCssBorderTags);
+// // 點擊CSS「虛擬類別標籤」
+// document.getElementById('loadCssPseudoClassTags').addEventListener('click', loadCssPseudoClassTags);
+
+// // 點擊CSS「結構相關虛擬類別標籤」
+// document.getElementById('loadCssStructurePseudoClassTags').addEventListener('click', loadCssStructurePseudoClassTags);
+
+// //點擊CSS「虛擬類別選擇器標籤」
+// document.getElementById('loadCssAttributePseudoClassTags').addEventListener('click', loadCssAttributePseudoClassTags);
+
+// //點擊CSS「虛擬類別選擇器標籤」
+// document.getElementById('loadCssBorderTags').addEventListener('click', loadCssBorderTags);
 
 // 點擊「HTML 工具」時，回到預設標籤
 document.querySelector('.navbar-brand').addEventListener('click', (e) => {
