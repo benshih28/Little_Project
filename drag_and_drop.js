@@ -46,6 +46,14 @@ const cssAttributePseudoClassTags = `
     <div class="drag-item" draggable="true" data-css="$=">$= 選擇器</div>
     <div class="drag-item" draggable="true" data-css="[]">[] 完全匹配選擇器</div>
 `;
+
+// CSS 邊框標籤
+const cssBorderTags = `
+    <div class="drag-item" draggable="true" data-css="border">預設邊框</div>
+    <button id="configureBorderButton" class="btn btn-info">配置邊框屬性</button>
+`;
+
+
 const cssRules = [];
 
 // 更新 CSS 顯示
@@ -206,6 +214,17 @@ const loadCssAttributePseudoClassTags = () => {
     resetCanvasAndCss(); // 重置畫庫和 CSS
     clearCanvasAttributePseudoClass(); // 設置畫庫的預設結構
     document.getElementById('customHtmlContainer').style.display = 'none'; // 隱藏自訂 HTML 區域
+};
+
+
+// 初始化畫庫預設標籤畫庫改邊框選項（CSS 第六項）
+const loadCssBorderTags = () => {
+    dragItemsContainer.innerHTML = cssBorderTags; // 加載拖曳標籤
+    addDragEvents(); // 添加拖曳事件
+    resetCanvasAndCss(); // 重置畫布與 CSS
+    clearCanvas(); // 清空畫庫
+    document.getElementById('customHtmlContainer').style.display = 'none'; // 隱藏自訂 HTML
+    document.getElementById('configureBorderButton').addEventListener('click', showBorderConfigModal); // 配置按鈕事件
 };
 
 //跳轉首頁結構
@@ -682,6 +701,86 @@ const showFormContentBuilder = () => {
     });
 };
 
+//顯示CSS自訂邊框屬性
+const showBorderConfigModal = () => {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'block';
+    modal.style.position = 'fixed';
+    modal.style.top = '50%';
+    modal.style.left = '50%';
+    modal.style.transform = 'translate(-50%, -50%)';
+    modal.style.backgroundColor = 'white';
+    modal.style.padding = '20px';
+    modal.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+    modal.style.width = '400px';
+
+    modal.innerHTML = `
+        <form id="borderForm">
+            <h5>配置邊框屬性</h5>
+            <label><input type="checkbox" id="borderTop" value="top"> 上邊框 (5px)</label><br>
+            <label><input type="checkbox" id="borderRight" value="right"> 右邊框 (5px)</label><br>
+            <label><input type="checkbox" id="borderBottom" value="bottom"> 下邊框 (5px)</label><br>
+            <label><input type="checkbox" id="borderLeft" value="left"> 左邊框 (5px)</label><br>
+            
+            <h5>邊框樣式</h5>
+            <select id="borderStyle">
+                <option value="solid">實線 (solid)</option>
+                <option value="dashed">虛線 (dashed)</option>
+                <option value="dotted">點狀 (dotted)</option>
+                <option value="double">雙線 (double)</option>
+            </select>
+              
+            <h5>邊框顏色</h5>
+            <input type="color" id="borderColor" class="form-control" value="#000000">
+
+            <h5>邊框圓角 (px)</h5>
+            <input type="number" id="borderRadius" class="form-control" placeholder="例如：10">
+
+            
+            <button type="button" id="applyBorderStyles" class="btn btn-primary mt-3">生成拖曳標籤</button>
+            <button type="button" id="closeBorderConfigModal" class="btn btn-secondary mt-3">關閉</button>
+        </form>
+    `;
+
+    document.body.appendChild(modal);
+
+    // 生成拖曳標籤
+    document.getElementById('applyBorderStyles').addEventListener('click', () => {
+        const top = document.getElementById('borderTop').checked ? '5px' : '0';
+        const right = document.getElementById('borderRight').checked ? '5px' : '0';
+        const bottom = document.getElementById('borderBottom').checked ? '5px' : '0';
+        const left = document.getElementById('borderLeft').checked ? '5px' : '0';
+        const style = document.getElementById('borderStyle').value;
+        const color = document.getElementById('borderColor').value;
+        const radius = document.getElementById('borderRadius').value || '0';
+
+        const borderCss = `
+            border-top: ${top} ${style} ${color};
+            border-right: ${right} ${style} ${color};
+            border-bottom: ${bottom} ${style} ${color};
+            border-left: ${left} ${style} ${color};
+            border-radius: ${radius}px;
+        `;
+
+        const newDragItem = document.createElement('div');
+        newDragItem.className = 'drag-item';
+        newDragItem.draggable = true;
+        newDragItem.setAttribute('data-css', borderCss);
+        newDragItem.textContent = `邊框設定 (${style}, 顏色: ${color}, 圓角: ${radius}px)`;
+        dragItemsContainer.appendChild(newDragItem);
+        addDragEvents();
+
+        document.body.removeChild(modal);
+    });
+
+    // 關閉彈窗
+    document.getElementById('closeBorderConfigModal').addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
+};
+
+
 
 // 點擊「風格與語氣標籤」
 document.getElementById('loadStyleTags').addEventListener('click', () => {
@@ -743,6 +842,8 @@ document.getElementById('loadFormTags').addEventListener('click', () => {
     document.getElementById('customHtmlContainer').style.display = 'block';
 });
 
+
+
 // 更新畫布程式碼顯示
 function updateCodeDisplay() {
     const content = Array.from(canvas.children)
@@ -794,8 +895,14 @@ canvas.addEventListener('drop', e => {
 
     const isCssFirstSection = dragItemsContainer.innerHTML.includes('標籤選擇器 (tag)'); // 判斷當前是不是CSS第一項
 
+    
+
     if (cssData) {
         const styleTag = document.createElement('style');
+        let uniqueClass = '';
+        let newHtml = ''; // 用於存放新增的 HTML 結構
+
+        // CSS 親屬選擇器
         if (cssData === 'div > h1') {
             styleTag.textContent = '#canvas > div > h1 { background-color: red; }'; // 子選擇器
         } else if (cssData === 'div h1') {
@@ -804,6 +911,9 @@ canvas.addEventListener('drop', e => {
             styleTag.textContent = '#canvas div + h1 { background-color: green; }'; // 相鄰兄弟選擇器
         } else if (cssData === 'div ~ h1') {
             styleTag.textContent = '#canvas div ~ h1 { background-color: blue; }'; // 全體兄弟選擇器
+
+
+        // CSS 虛擬類別
         } else if (cssData === ':link') {
             styleTag.textContent = '#canvas > p > a:link { color: yellowgreen; }'; // :link
             const newHtml = '<p><a href="https://www.w3schools.com/css/css_pseudo_classes.asp" target="_blank">設定超連結未連結時的顏色</a></p>';
@@ -820,6 +930,9 @@ canvas.addEventListener('drop', e => {
             styleTag.textContent = '#canvas > p > a:active { color: black; }'; // :active
             const newHtml = '<p><a href="https://www.w3schools.com/css/css_pseudo_classes.asp" target="_blank">設定超連結點選連結當下的顏色</a></p>';
             canvas.innerHTML += newHtml;
+
+
+        // CSS 結構相關虛擬類別
         } else if(cssData === ':first-child') {
             styleTag.textContent = '.containerPseudoClass :first-child { color: red; }'; // 將第一個子元素設為紅色 
             const newHtml = '<p>將第一個子元素設為紅色 </p>';
@@ -864,6 +977,13 @@ canvas.addEventListener('drop', e => {
             styleTag.textContent = '[data-category="external"] { text-decoration: underline; color: blue; }'; // 完全匹配 data-category="external" 
             const newHtml = '<p>完全匹配屬性值添加下劃線，文字顏色設為藍色 </p>';
             canvas.innerHTML += newHtml; 
+
+
+        // CSS 邊框設定（第六項）
+        } else if (cssData.includes('border')) {
+            const uniqueClass = `border-item-${Date.now()}`; // 確保類名唯一
+            styleTag.textContent = `.${uniqueClass} { ${cssData} }`; // 動態生成樣式
+            newHtml = `<div class="${uniqueClass}"><p>${cssData}</p></div>`;
         }
 
 
@@ -883,10 +1003,21 @@ canvas.addEventListener('drop', e => {
             showCssSpecificity(cssData);
         }
 
+        // 添加樣式到畫布
         if (styleTag.textContent) {
             document.head.appendChild(styleTag);
             cssRules.push(styleTag.textContent);
             updateCssDisplay();
+        }
+
+        // 如果有新增的 HTML 結構，將其添加到畫庫
+        if (newHtml) {
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = newHtml;
+            const content = wrapper.firstElementChild;
+            if (content) {
+                canvas.appendChild(content);
+            }
         }
     }
 
@@ -917,6 +1048,9 @@ document.getElementById('loadCssStructurePseudoClassTags').addEventListener('cli
 
 //點擊CSS「虛擬類別選擇器標籤」
 document.getElementById('loadCssAttributePseudoClassTags').addEventListener('click', loadCssAttributePseudoClassTags);
+
+//點擊CSS「虛擬類別選擇器標籤」
+document.getElementById('loadCssBorderTags').addEventListener('click', loadCssBorderTags);
 
 // 點擊「HTML 工具」時，回到預設標籤
 document.querySelector('.navbar-brand').addEventListener('click', (e) => {
