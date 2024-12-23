@@ -1,0 +1,120 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    padding-top: 70px;
+    padding-right: 300px; /* 為右側固定側欄預留空間 */
+}
+
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.container {
+    margin-top: 20px;
+}
+
+.code-container {
+    background-color: #f1f1f1;
+    border: 1px solid #ced4da;
+    padding: 10px;
+    font-family: monospace;
+    white-space: pre-wrap;
+}
+
+.drag-item {
+    padding: 10px;
+    margin: 5px;
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    cursor: grab;
+}
+.drag-item:active {
+    cursor: grabbing;
+}
+
+#canvas {
+    min-height: 300px;
+    background-color: #ffffff;
+    border: 2px dashed #ced4da;
+    padding: 10px;
+    overflow-x: auto;
+}
+
+.dropdown {
+    margin: 5px;
+}
+
+/* 新增右側固定側欄樣式 */
+#codeSidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 300px;
+    background-color: #ffffff;
+    border-left: 1px solid #ced4da;
+    padding: 15px;
+    overflow-y: auto;
+    z-index: 1040; /* 確保顯示在主內容之上 */
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+#codeSidebar h5 {
+    margin-top: 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #495057;
+}
+
+#codeSidebar pre {
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 14px;
+    white-space: pre-wrap;
+    border-radius: 4px;
+    overflow-x: auto;
+}
+
+/* 畫面小於768px時隱藏右側側欄 */
+@media (max-width: 768px) {
+    #codeSidebar {
+        display: none;
+    }
+
+    body {
+        padding-right: 0; /* 移除預留空間 */
+    }
+}
+
+#canvas {
+    min-height: 300px; /* 最小高度 */
+    max-height: 500px; /* 最大高度 */
+    background-color: #ffffff;
+    border: 2px dashed #ced4da;
+    padding: 10px;
+    overflow-y: auto; /* 啟用垂直滾動條 */
+    overflow-x: hidden; /* 禁止水平滾動條 */
+    scrollbar-width: thin; /* 瀏覽器原生滾動條樣式（Firefox） */
+    scrollbar-color: #adb5bd #f8f9fa; /* 滾動條顏色（Firefox） */
+}
+
+/* 自定義滾動條樣式（Webkit瀏覽器，如Chrome和Safari） */
+#canvas::-webkit-scrollbar {
+    width: 8px; /* 滾動條寬度 */
+}
+
+#canvas::-webkit-scrollbar-track {
+    background: #f8f9fa; /* 滾動條軌道顏色 */
+}
+
+#canvas::-webkit-scrollbar-thumb {
+    background-color: #adb5bd; /* 滾動條滑塊顏色 */
+    border-radius: 4px; /* 圓角 */
+}
