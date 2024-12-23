@@ -111,7 +111,7 @@ nav {
 }
 
 #canvas::-webkit-scrollbar-track {
-    background: #f8f9fa; /* 滾動條軌道顏色 */
+    background: #f8f9fa;  /* 滾動條軌道顏色 */
 }
 
 #canvas::-webkit-scrollbar-thumb {

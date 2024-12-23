@@ -220,7 +220,7 @@ const loadCssAttributePseudoClassTags = () => {
 
 // 初始化畫庫預設標籤畫庫改邊框選項（CSS 第六項）
 const loadCssBorderTags = () => {
-    dragItemsContainer.innerHTML = cssBorderTags; // 加載拖曳標籤
+    dragItemsContainer.innerHTML = cssBorderTags;  // 加載拖曳標籤
     addDragEvents(); // 添加拖曳事件
     resetCanvasAndCss(); // 重置畫布與 CSS
     clearCanvas(); // 清空畫庫
