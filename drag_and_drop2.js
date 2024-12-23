@@ -79,66 +79,49 @@ const showCssSpecificity = (selector) => {
 
 // 清空畫布並初始化
 const resetCanvasAndCss = () => {
-    canvas.innerHTML = ''; // 清空畫布內容
+    resetCanvasWithContent('<p class="text-muted">將標籤拖拽到這裡</p>');
+};
+
+// 通用函式：清空畫布並更新
+const resetCanvasWithContent = (canvasContent = '') => {
+    canvas.innerHTML = canvasContent; // 更新畫布內容
     cssRules.length = 0; // 清空 CSS 規則陣列
     updateCssDisplay(); // 更新 CSS 顯示
-};
 
-// 清空畫布功能（預設）
-const clearCanvas = () => {
-    canvas.innerHTML = '<p class="text-muted">將標籤拖拽到這裡</p>';
-    cssRules.length = 0;
-    updateCssDisplay();
-
-    // 移除所有應用的樣式
+    // 移除所有應用的樣式標籤
     const existingStyles = document.querySelectorAll('style');
     existingStyles.forEach(styleTag => styleTag.remove());
 };
 
-// 清空畫布功能（親屬結構）
-const clearCanvasFamily = () => {
-    canvas.innerHTML = `
-        <div>
-    <h1>兒子-1</h1>
-    <section>
-        <h1>孫子</h1>
+// 預設清空畫布
+const clearCanvas = () => resetCanvasWithContent('<p class="text-muted">將標籤拖拽到這裡</p>');
+
+// 親屬結構清空畫布
+const clearCanvasFamily = () => resetCanvasWithContent(`
+    <div>
+        <h1>兒子-1</h1>
         <section>
-            <h1>曾孫</h1>
+            <h1>孫子</h1>
+            <section>
+                <h1>曾孫</h1>
+            </section>
         </section>
-    </section>
-    <h1>兒子-2</h1>
-</div>
-<h1>伯父</h1>
-<h1>叔叔</h1>
-<p>隔壁鄰居-1</p>
-    `;
+        <h1>兒子-2</h1>
+    </div>
+    <h1>伯父</h1>
+    <h1>叔叔</h1>
+    <p>隔壁鄰居-1</p>
+`);
 
-    // 移除所有應用的樣式
-    const existingStyles = document.querySelectorAll('style');
-    existingStyles.forEach(styleTag => styleTag.remove());
-
-    cssRules.length = 0;
-    updateCssDisplay();
-    updateCodeDisplayCSS_HTML(); // 更新畫布程式碼
-};
-
-// 清空畫布功能（虛擬標籤）
-const clearCanvasPseudoClass = () => {
-    canvas.innerHTML = '<p><a href="https://www.w3schools.com/css/css_pseudo_classes.asp" target="_blank">CSS Pseudo-classes</a></p>';
-    cssRules.length = 0;// 清空 CSS 規則
-
-
-    // 移除所有應用的樣式
-    const existingStyles = document.querySelectorAll('style');
-    existingStyles.forEach(styleTag => styleTag.remove());
-    updateCssDisplay();
-    updateCodeDisplayCSS_HTML(); // 更新畫布程式碼
-};
-
+// 虛擬標籤清空畫布
+const clearCanvasPseudoClass = () => resetCanvasWithContent(`
+    <p>
+        <a href="https://www.w3schools.com/css/css_pseudo_classes.asp" target="_blank">CSS Pseudo-classes</a>
+    </p>
+`);
 
 // 清空畫庫功能增加結構相關虛擬類別
-const clearCanvasStructurePseudoClass = () => {
-    canvas.innerHTML = `
+const clearCanvasStructurePseudoClass = () => resetCanvasWithContent(`
 <div class="containerPseudoClass">
     <p>Paragraph 1</p>
     <span>Span 1</span>
@@ -146,85 +129,36 @@ const clearCanvasStructurePseudoClass = () => {
     <span class="exclude">Span 2</span>
     <p>Paragraph 3</p>
 </div>
-    `;
-    cssRules.length = 0;// 清空 CSS 規則
-    // 移除所有應用的樣式
-    const existingStyles = document.querySelectorAll('style');
-    existingStyles.forEach(styleTag => styleTag.remove());
-    updateCssDisplay();
-    updateCodeDisplayCSS_HTML();
-};
+`);
+
 
 // 清空畫庫功能增加虛擬類別
-const clearCanvasAttributePseudoClass = () => {
-    canvas.innerHTML = `
+const clearCanvasAttributePseudoClass = () => resetCanvasWithContent(`
 <div class="container">
     <p id="intro" data-info="start">Introduction</p>
     <p class="content" data-info="middle">Main Content</p>
     <p class="content" data-info="end">Conclusion</p>
     <a href="https://example.com" class="link" data-category="external">Visit Example</a>
 </div>
-    `;
-    cssRules.length = 0; // 清空 CSS 規則
-    updateCssDisplay(); // 更新 CSS 顯示
-    updateCodeDisplayCSS_HTML(); // 更新畫庫程式碼顯示
-};
+    `);
 
 
-// 初始化畫庫（CSS 第一項）
-const loadCssTags = () => {
-    dragItemsContainer.innerHTML = cssTags; // 加載拖曳標籤
+// 通用函式：初始化畫庫
+const initializeDragItems = (tagsContent, clearCanvasCallback) => {
+    dragItemsContainer.innerHTML = tagsContent; // 加載拖曳標籤
     addDragEvents(); // 添加拖曳事件
-    resetCanvasAndCss(); // 重置畫布與 CSS
-    clearCanvas(); // 清空畫布（預設）
+    clearCanvasCallback(); // 清空畫布並執行特定邏輯
     document.getElementById('customHtmlContainer').style.display = 'none'; // 隱藏自訂 HTML
 };
 
-// 初始化畫庫預設標籤畫庫改親屬（CSS 第二項）
-const loadCssFamilyTags = () => {
-    dragItemsContainer.innerHTML = cssFamilyTags; // 加載拖曳標籤
-    addDragEvents(); // 添加拖曳事件
-    resetCanvasAndCss(); // 重置畫布與 CSS
-    clearCanvasFamily(); // 清空畫布並加載親屬結構
-    document.getElementById('customHtmlContainer').style.display = 'none'; // 隱藏自訂 HTML
-};
-
-// 初始化畫庫預設標籤畫庫改虛擬標籤超連結（CSS 第三項）
-const loadCssPseudoClassTags = () => {
-    dragItemsContainer.innerHTML = cssPseudoClassTags; // 加載拖曳標籤
-    addDragEvents(); // 添加拖曳事件
-    resetCanvasAndCss(); // 重置畫布與 CSS
-    clearCanvasPseudoClass(); // 清空畫布並加載虛擬標籤內容
-    document.getElementById('customHtmlContainer').style.display = 'none'; // 隱藏自訂 HTML
-};
-
-
-// 初始化畫庫預設標籤畫庫改結構相關虛擬類別（CSS 第四項）
-const loadCssStructurePseudoClassTags = () => {
-    dragItemsContainer.innerHTML = cssStructurePseudoClassTags;
-    addDragEvents();
-    resetCanvasAndCss();
-    clearCanvasStructurePseudoClass(); // 清空畫庫增加結構相關虛擬類別
-    document.getElementById('customHtmlContainer').style.display = 'none'; // 隱藏自訂 HTML
-};
-
-// 初始化畫庫預設標籤畫庫改虛擬類別選擇器（CSS 第五項）
-const loadCssAttributePseudoClassTags = () => {
-    dragItemsContainer.innerHTML = cssAttributePseudoClassTags; // 更新可拖曳標籤
-    addDragEvents(); // 設置拖曳事件
-    resetCanvasAndCss(); // 重置畫庫和 CSS
-    clearCanvasAttributePseudoClass(); // 設置畫庫的預設結構
-    document.getElementById('customHtmlContainer').style.display = 'none'; // 隱藏自訂 HTML 區域
-};
-
-
-// 初始化畫庫預設標籤畫庫改邊框選項（CSS 第六項）
+// 使用通用函式進行初始化
+const loadCssTags = () => initializeDragItems(cssTags, clearCanvas);
+const loadCssFamilyTags = () => initializeDragItems(cssFamilyTags, clearCanvasFamily);
+const loadCssPseudoClassTags = () => initializeDragItems(cssPseudoClassTags, clearCanvasPseudoClass);
+const loadCssStructurePseudoClassTags = () => initializeDragItems(cssStructurePseudoClassTags, clearCanvasStructurePseudoClass);
+const loadCssAttributePseudoClassTags = () => initializeDragItems(cssAttributePseudoClassTags, clearCanvasAttributePseudoClass);
 const loadCssBorderTags = () => {
-    dragItemsContainer.innerHTML = cssBorderTags;  // 加載拖曳標籤
-    addDragEvents(); // 添加拖曳事件
-    resetCanvasAndCss(); // 重置畫布與 CSS
-    clearCanvas(); // 清空畫庫
-    document.getElementById('customHtmlContainer').style.display = 'none'; // 隱藏自訂 HTML
+    initializeDragItems(cssBorderTags, clearCanvas);
     document.getElementById('configureBorderButton').addEventListener('click', showBorderConfigModal); // 配置按鈕事件
 };
 
@@ -411,7 +345,7 @@ const showOlForm = () => {
         document.body.removeChild(modal);
     });
 };
-//// 顯示列表LI屬性
+// 顯示列表LI屬性
 const showLiForm = () => {
     const modal = document.createElement('div');
     modal.className = 'modal';
@@ -782,46 +716,6 @@ const showBorderConfigModal = () => {
 };
 
 
-//綁定Nav html選項與事件處理函數
-const tagHandlers = [
-    { id: 'loadStyleTags', content: styleTags }, // 點擊「風格與語氣標籤」
-    { id: 'loadStructureTags', content: structureTags }, // 點擊「結構標籤」
-    { id: 'loadListTags', content: listTags, extraHandlers: [
-        { buttonId: 'configureOlButton', handler: showOlForm },
-        { buttonId: 'configureLiButton', handler: showLiForm }
-    ]}, // 點擊「列表標籤」
-    { id: 'loadLinkTags', content: linkTags }, // 點擊「連結標籤」
-    { id: 'loadMediaTags', content: mediaTags }, // 點擊「媒體標籤」
-    { id: 'loadTableTags', content: tableTags, extraHandlers: [
-        { buttonId: 'configureTableButton', handler: showTableForm }
-    ]}, // 點擊「表格標籤」
-    { id: 'loadFormTags', content: formTags, extraHandlers: [
-        { buttonId: 'configureFormButton', handler: showFormContentBuilder }
-    ]} // 點擊「表單標籤」
-];
-
-tagHandlers.forEach(({ id, content, extraHandlers }) => {
-    const button = document.getElementById(id);
-    if (button) {
-        button.addEventListener('click', () => {
-            dragItemsContainer.innerHTML = content;
-            addDragEvents();
-            document.getElementById('customHtmlContainer').style.display = 'block';
-
-            // 處理額外的按鈕綁定
-            if (extraHandlers) {
-                extraHandlers.forEach(({ buttonId, handler }) => {
-                    const extraButton = document.getElementById(buttonId);
-                    if (extraButton) {
-                        extraButton.addEventListener('click', handler);
-                    }
-                });
-            }
-        });
-    }
-});
-
-
 // 更新畫布程式碼顯示
 function updateCodeDisplay() {
     const content = Array.from(canvas.children)
@@ -1009,21 +903,53 @@ const appendHtmlToCanvas = (html) => {
 
 
 
-// 綁定Nav CSS選項與事件處理函數
-const buttonHandlers = [
-    { id: 'loadCssTags', handler: loadCssTags }, // 點擊CSS「選擇器標籤」
-    { id: 'clearCanvas', handler: clearCanvas }, // 點擊清空畫庫按鈕
-    { id: 'loadCssFamilyTags', handler: loadCssFamilyTags },// 點擊CSS「親屬選擇器標籤」
-    { id: 'loadCssPseudoClassTags', handler: loadCssPseudoClassTags },// 點擊CSS「虛擬類別標籤」
-    { id: 'loadCssStructurePseudoClassTags', handler: loadCssStructurePseudoClassTags },// 點擊CSS「結構相關虛擬類別標籤」
-    { id: 'loadCssAttributePseudoClassTags', handler: loadCssAttributePseudoClassTags },//點擊CSS「虛擬類別選擇器標籤」
-    { id: 'loadCssBorderTags', handler: loadCssBorderTags }//點擊CSS「border標籤」
+// 綁定Nav CSS&html 選項與事件處理函數
+const handlersConfig = [
+    { type: 'css', id: 'loadCssTags', content: cssTags, clearCanvas: clearCanvas },
+    { type: 'css', id: 'loadCssFamilyTags', content: cssFamilyTags, clearCanvas: clearCanvasFamily },
+    { type: 'css', id: 'loadCssPseudoClassTags', content: cssPseudoClassTags, clearCanvas: clearCanvasPseudoClass },
+    { type: 'css', id: 'loadCssStructurePseudoClassTags', content: cssStructurePseudoClassTags, clearCanvas: clearCanvasStructurePseudoClass },
+    { type: 'css', id: 'loadCssAttributePseudoClassTags', content: cssAttributePseudoClassTags, clearCanvas: clearCanvasAttributePseudoClass },
+    { type: 'css', id: 'loadCssBorderTags', content: cssBorderTags, clearCanvas: clearCanvas, extraHandlers: [
+        { buttonId: 'configureBorderButton', handler: showBorderConfigModal },
+    ]},
+    { type: 'html', id: 'loadStyleTags', content: styleTags },
+    { type: 'html', id: 'loadStructureTags', content: structureTags },
+    { type: 'html', id: 'loadListTags', content: listTags, extraHandlers: [
+        { buttonId: 'configureOlButton', handler: showOlForm },
+        { buttonId: 'configureLiButton', handler: showLiForm },
+    ]},
+    { type: 'html', id: 'loadLinkTags', content: linkTags },
+    { type: 'html', id: 'loadMediaTags', content: mediaTags },
+    { type: 'html', id: 'loadTableTags', content: tableTags, extraHandlers: [
+        { buttonId: 'configureTableButton', handler: showTableForm },
+    ]},
+    { type: 'html', id: 'loadFormTags', content: formTags, extraHandlers: [
+        { buttonId: 'configureFormButton', handler: showFormContentBuilder },
+    ]},
 ];
 
-buttonHandlers.forEach(({ id, handler }) => {
+handlersConfig.forEach(({ id, content, clearCanvas, extraHandlers }) => {
     const button = document.getElementById(id);
     if (button) {
-        button.addEventListener('click', handler);
+        button.addEventListener('click', () => {
+            if (content) {
+                dragItemsContainer.innerHTML = content; // 更新標籤內容
+                addDragEvents(); // 添加拖拽事件
+                document.getElementById('customHtmlContainer').style.display = 'block';
+            }
+            if (clearCanvas) clearCanvas(); // 清空畫布
+
+            // 綁定額外的按鈕事件
+            if (extraHandlers) {
+                extraHandlers.forEach(({ buttonId, handler }) => {
+                    const extraButton = document.getElementById(buttonId);
+                    if (extraButton) {
+                        extraButton.addEventListener('click', handler);
+                    }
+                });
+            }
+        });
     }
 });
 
