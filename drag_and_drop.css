@@ -2,7 +2,7 @@ body {
     font-family: Arial, sans-serif;
     background-color: #f8f9fa;
     padding-top: 70px;
-    padding-right: 300px; /* 為右側固定側欄預留空間 */
+    padding-right: 400px; /* 為右側固定側欄預留空間 */
 }
 
 nav {
@@ -55,7 +55,7 @@ nav {
     top: 0;
     right: 0;
     height: 100%;
-    width: 300px;
+    width: 400px; /* 增加側欄寬度為 400px */
     background-color: #ffffff;
     border-left: 1px solid #ced4da;
     padding: 15px;
