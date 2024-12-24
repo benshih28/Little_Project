@@ -1,15 +1,29 @@
 // utils.js: 通用工具函式
 
-import { dragItemsContainer } from './domReferences.js';
-
+import { domReferences } from './domReferences.js';
 
 /**
  * 更新 CSS 顯示
  * @param {HTMLElement} cssDisplay - 顯示 CSS 規則的元素
  * @param {Array} cssRules - CSS 規則陣列
  */
-export const updateCssDisplay = (cssDisplay, cssRules) => {
-    cssDisplay.textContent = cssRules.join('\n');
+export const updateCssDisplay = (cssRules) => {
+    domReferences.cssDisplay.textContent = cssRules.join('\n');
+};
+
+
+export const updateCodeDisplay = () => {
+    const content = Array.from(domReferences.canvas.children)
+        .filter(child => !(child.tagName === 'P' && child.classList.contains('text-muted')))
+        .filter(child => !(child.tagName === 'P' && child.textContent.includes('用於設定網頁字符編碼，通常設置為 UTF-8。')))
+        .filter(child => !(child.tagName === 'P' && child.textContent.includes('用於優化行動裝置上的顯示。')))
+        .filter(child => !(child.tagName === 'P' && child.textContent.includes('已被大多數搜尋引擎忽略，現在通常不用。')))
+        .filter(child => !(child.tagName === 'P' && child.textContent.includes('指示搜尋引擎是否應該索引該頁面，以及是否應跟隨頁面上的連結。')))
+        .filter(child => !(child.tagName === 'P' && child.textContent.includes('用於優化社群平台上的分享效果，例如 Facebook 和 LinkedIn。')))
+        .filter(child => !(child.tagName === 'P' && child.textContent.includes('告訴搜尋引擎網頁的正規版本，避免重複內容問題。')))
+        .map(child => child.outerHTML)
+        .join('\n');
+    domReferences.codeDisplay.textContent = content;
 };
 
 /**
@@ -18,6 +32,9 @@ export const updateCssDisplay = (cssDisplay, cssRules) => {
  * @returns {number} - 優先級數值
  */
 export const calculateCssSpecificity = (selector) => {
+    if (!selector) {
+        return 0;
+    }
     const ids = (selector.match(/#/g) || []).length;
     const classes = (selector.match(/(\.[\w-]+|\[[^\]]+\]|::?[\w-]+)/g) || []).length;
     const tags = (selector.match(/^[a-zA-Z]+|[ >+~][a-zA-Z]+/g) || []).length;
@@ -26,27 +43,20 @@ export const calculateCssSpecificity = (selector) => {
 
 /**
  * 顯示 CSS 選擇器的優先級
- * @param {HTMLElement} canvas - 畫布元素
  * @param {string} selector - CSS 選擇器
  */
-export const showCssSpecificity = (canvas, selector) => {
+export const showCssSpecificity = (selector) => {
+    const canvas = domReferences.canvas;
+    if (!canvas || !(canvas instanceof HTMLElement)) {
+        console.error('Invalid canvas element');
+        return;
+    }
     const specificity = calculateCssSpecificity(selector);
-    const specificityDisplay = document.createElement('p');
-    specificityDisplay.textContent = `選擇器: ${selector}，優先級: ${specificity}`;
-    canvas.appendChild(specificityDisplay);
+    const specificityElement = document.createElement('p');
+    specificityElement.textContent = `選擇器: ${selector}，優先級: ${specificity}`;
+    canvas.appendChild(specificityElement);
 };
 
-/**
- * 清空畫布並初始化
- * @param {HTMLElement} canvas - 畫布元素
- * @param {Array} cssRules - CSS 規則陣列
- * @param {HTMLElement} cssDisplay - 顯示 CSS 的元素
- */
-export const resetCanvasAndCss = (canvas, cssRules, cssDisplay) => {
-    canvas.innerHTML = ''; // 清空畫布內容
-    cssRules.length = 0; // 清空 CSS 規則
-    updateCssDisplay(cssDisplay, cssRules); // 更新顯示
-};
 
 //顯示CSS自訂邊框屬性
 export const showBorderConfigModal = () => {
@@ -115,7 +125,7 @@ export const showBorderConfigModal = () => {
         newDragItem.draggable = true;
         newDragItem.setAttribute('data-css', borderCss);
         newDragItem.textContent = `邊框設定 (${style}, 顏色: ${color}, 圓角: ${radius}px)`;
-        dragItemsContainer.appendChild(newDragItem);
+        domReferences.dragItemsContainer.appendChild(newDragItem);
         addDragEvents();
 
         document.body.removeChild(modal);
@@ -179,7 +189,7 @@ export const showOlForm = () => {
         dragItem.setAttribute('data-html', olHtml);
         dragItem.textContent = `有序列表 (type=${type || 'default'})`;
 
-        dragItemsContainer.appendChild(dragItem);
+        domReferences.dragItemsContainer.appendChild(dragItem);
         addDragEvents();
 
         document.body.removeChild(modal);
@@ -227,7 +237,7 @@ export const showLiForm = () => {
         dragItem.setAttribute('data-html', liHtml);
         dragItem.textContent = `LI (value=${value || 'default'})`;
 
-        dragItemsContainer.appendChild(dragItem);
+        domReferences.dragItemsContainer.appendChild(dragItem);
         addDragEvents();
 
         document.body.removeChild(modal);
@@ -239,7 +249,7 @@ export const showLiForm = () => {
 };
 
 //顯示自訂表格標籤
-const showTableForm = () => {
+export const showTableForm = () => {
     const modal = document.createElement('div');
     modal.className = 'modal';
     modal.style.display = 'block';
@@ -279,7 +289,7 @@ const showTableForm = () => {
         const rowspan = document.getElementById('rowspan').value;
 
         let tableHtml = '<table border="1" style="border-collapse: collapse;">';
-       
+
         tableHtml += '<thead><tr>';
         for (let i = 0; i < cols; i++) {
             if (i < colspan) {
@@ -291,15 +301,15 @@ const showTableForm = () => {
         }
         tableHtml += '</tr></thead><tbody>';
 
-        for (let i = 0; i < rows-1; i++) {
+        for (let i = 0; i < rows - 1; i++) {
             tableHtml += '<tr>';
             for (let j = 0; j < cols; j++) {
                 if (j === 0 && i === 0) {
                     tableHtml += `<td style="border: 1px solid black;" rowspan="${rowspan}">A1</td>`;
-                 } else if (0<i && i<rowspan && j===1){
+                } else if (0 < i && i < rowspan && j === 1) {
 
                 }
-                else{
+                else {
                     tableHtml += `<td style="border: 1px solid black;">資料</td>`;
                 }
             }
@@ -308,16 +318,13 @@ const showTableForm = () => {
 
         tableHtml += '</tbody></table>';
 
-        
-        
+        const newDragItem = document.createElement('div');
+        newDragItem.className = 'drag-item';
+        newDragItem.draggable = true;
+        newDragItem.setAttribute('data-html', tableHtml);
+        newDragItem.textContent = `表格 (${rows}x${cols})`;
 
-        const dragItem = document.createElement('div');
-        dragItem.className = 'drag-item';
-        dragItem.draggable = true;
-        dragItem.setAttribute('data-html', tableHtml);
-        dragItem.textContent = `表格 (${rows}x${cols})`;
-
-        dragItemsContainer.appendChild(dragItem);
+        domReferences.dragItemsContainer.appendChild(newDragItem);
         addDragEvents();
 
         document.body.removeChild(modal);
@@ -329,7 +336,7 @@ const showTableForm = () => {
 };
 
 //顯示自訂表單標籤
-const showFormContentBuilder = () => {
+export const showFormContentBuilder = () => {
     const modal = document.createElement('div');
     modal.className = 'modal';
     modal.style.display = 'block';
@@ -469,7 +476,7 @@ const showFormContentBuilder = () => {
         dragItem.setAttribute('data-html', formContent);
         dragItem.textContent = '自訂表單';
 
-        dragItemsContainer.appendChild(dragItem);
+        domReferences.dragItemsContainer.appendChild(dragItem);
         addDragEvents();
 
         document.body.removeChild(modal);
@@ -480,12 +487,15 @@ const showFormContentBuilder = () => {
     });
 };
 
+
 // 設定拖拽事件
 export const addDragEvents = () => {
     document.querySelectorAll('.drag-item').forEach(item => {
         item.addEventListener('dragstart', e => {
+
             const cssData = item.getAttribute('data-css');
             const htmlData = item.getAttribute('data-html');
+
             if (cssData) {
                 e.dataTransfer.setData('text/css', cssData);
             }
@@ -495,6 +505,186 @@ export const addDragEvents = () => {
         });
     });
 };
+
+// 新增 canvas 的 dragover 和 drop 事件處理器
+export const initializeCanvasEvents = (cssRules) => {
+    const canvas = domReferences.canvas;
+    if (!canvas) {
+        console.error('Invalid canvas element');
+        return;
+    }
+    canvas.addEventListener('dragover', (e) => e.preventDefault()); // 防止默認行為以允許拖放
+    canvas.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const htmlData = e.dataTransfer.getData('text/html');
+        const cssData = e.dataTransfer.getData('text/css');
+        const isCssFirstSection = checkIsCssFirstSection();
+        if (cssData) {
+            handleCssDrop(cssData, isCssFirstSection, cssRules);
+        }
+        if (htmlData) {
+            handleHtmlDrop(htmlData);
+        }
+        updateCodeDisplay();
+    });
+};
+
+const checkIsCssFirstSection = () => {
+    return domReferences.dragItemsContainer.innerHTML.includes('標籤選擇器 (tag)');
+};
+
+const handleCssDrop = (cssData, isCssFirstSection, cssRules) => {
+    const styleTag = document.createElement('style'); // 創建一個 <style> 標籤
+    let newHtml = ''; // 用於存放新增的 HTML 結構
+
+    // CSS 選擇器和樣式的映射表
+    const cssRulesMap = {
+        'div > h1': '#canvas > div > h1 { background-color: red; }',
+        'div h1': '#canvas div h1 { background-color: orange; }',
+        'div + h1': '#canvas div + h1 { background-color: green; }',
+        'div ~ h1': '#canvas div ~ h1 { background-color: blue; }',
+        ':link': '#canvas > p > a:link { color: yellowgreen; }',
+        ':visited': '#canvas > p > a:visited { color: lightcoral; }',
+        ':hover': '#canvas > p > a:hover { color: lightskyblue; }',
+        ':active': '#canvas > p > a:active { color: black; }',
+        ':first-child': '.containerPseudoClass :first-child { color: red; }',
+        ':last-child': '.containerPseudoClass :last-child { color: blue; }',
+        ':nth-child(n)': '.containerPseudoClass :nth-child(2) { background-color: lightgreen; }',
+        ':nth-of-type(n)': '.containerPseudoClass p:nth-of-type(2) { font-weight: bold; }',
+        ':not(selector)': '.containerPseudoClass :not(.exclude) { text-decoration: underline; }',
+        '::before': '.container p::before { content: "• "; color: orange; }',
+        '::after': '.container p::after { content: " (end)"; color: gray; }',
+        '^=': '[data-info^="start"] { font-weight: bold; }',
+        '*=': '[data-info*="middle"] { background-color: lightyellow; }',
+        '$=': '[data-info$="end"] { color: green; }',
+        '[]': '[data-category="external"] { text-decoration: underline; color: blue; }',
+    };
+
+    // 將 CSS 對應的 HTML 內容添加到畫布的映射表
+    const htmlContentMap = {
+        ':link': '<p><a href="https://www.w3schools.com/css/css_pseudo_classes.asp" target="_blank">設定超連結未連結時的顏色</a></p>',
+        ':visited': '<p><a href="https://www.w3schools.com/css/css_pseudo_classes.asp" target="_blank">設定超連結已連結過的顏色</a></p>',
+        ':hover': '<p><a href="https://www.w3schools.com/css/css_pseudo_classes.asp" target="_blank">設定滑鼠移至連結上方時的顏色</a></p>',
+        ':active': '<p><a href="https://www.w3schools.com/css/css_pseudo_classes.asp" target="_blank">設定超連結點選連結當下的顏色</a></p>',
+        ':first-child': '<p>將第一個子元素設為紅色 </p>',
+        ':last-child': '<p>將最後一個子元素設為藍色 </p>',
+        ':nth-child(n)': '<p>將第二個子元素背景設為淺綠色 </p>',
+        ':nth-of-type(n)': '<p>參數設2 ，將第二個 &lt;p&gt; 設為加粗 </p>',
+        ':not(selector)': '<p>參數設.exclude ，將不帶有 .exclude 類的元素加下劃線</p>',
+        '::before': '<p>在段落前添加橙色圓點</p>',
+        '::after': '<p>在段落後添加灰色結尾</p>',
+        '^=': '<p>選擇屬性值開頭為 "設定內容" 的元素加粗</p>',
+        '*=': '<p>選擇屬性值包含 "設定內容" 的元素背景設為淺綠色</p>',
+        '$=': '<p>選擇屬性值結尾為 "設定內容" 的元素文字顏色設為綠色</p>',
+        '[]': '<p>完全匹配屬性值添加下劃線，文字顏色設為藍色 </p>',
+    };
+
+    // 檢查是否有對應的 CSS 規則
+    if (cssRulesMap[cssData]) {
+        styleTag.textContent = cssRulesMap[cssData]; // 添加 CSS 規則
+        newHtml = htmlContentMap[cssData] || ''; // 獲取對應的 HTML
+    } else if (cssData.includes('border')) {
+        // 對於邊框樣式生成動態類
+        const uniqueClass = `border-item-${Date.now()}`; // 確保類名唯一
+        styleTag.textContent = `.${uniqueClass} { ${cssData} }`; // 動態生成樣式
+        newHtml = `<div class="${uniqueClass}"><p>${cssData}</p></div>`;
+    }
+
+    // 如果是 CSS 第一部分，特殊處理
+    if (isCssFirstSection) {
+        handleCssFirstSection(cssData, styleTag);
+    }
+
+    // 如果有樣式則添加到文檔中
+    if (styleTag.textContent) {
+        document.head.appendChild(styleTag); // 將樣式添加到 <head>
+        cssRules.push(styleTag.textContent); // 更新 CSS 規則
+        updateCssDisplay(cssRules); // 刷新顯示
+    }
+
+    // 如果有 HTML 則添加到畫布中
+    if (newHtml) {
+        appendHtmlToCanvas(newHtml);
+    }
+};
+
+/**
+ * 處理 HTML 的拖放邏輯
+ * @param {string} htmlData - 拖放的 HTML 數據
+ */
+const handleHtmlDrop = (htmlData) => {
+    const wrapper = document.createElement('div'); // 創建一個包裝 div
+    wrapper.innerHTML = htmlData; // 將 HTML 數據設置為包裝 div 的內容
+    const content = wrapper.firstElementChild; // 獲取包裝 div 的第一個子元素
+    if (content) {
+        if (content.tagName === 'META' || content.tagName === 'LINK') {
+            let description = '';
+            switch (content.getAttribute('name') || content.getAttribute('property') || content.getAttribute('rel')) {
+                case 'charset':
+                    description = '用於設定網頁字符編碼，通常設置為 UTF-8。';
+                    break;
+                case 'viewport':
+                    description = '用於優化行動裝置上的顯示。';
+                    break;
+                case 'keywords':
+                    description = '已被大多數搜尋引擎忽略，現在通常不用。';
+                    break;
+                case 'robots':
+                    description = '指示搜尋引擎是否應該索引該頁面，以及是否應跟隨頁面上的連結。';
+                    break;
+                case 'og:title':
+                case 'og:description':
+                case 'og:image':
+                case 'og:url':
+                    description = '用於優化社群平台上的分享效果，例如 Facebook 和 LinkedIn。';
+                    break;
+                case 'canonical':
+                    description = '告訴搜尋引擎網頁的正規版本，避免重複內容問題。';
+                    break;
+                default:
+                    description = '用於設定網頁字符編碼，通常設置為 UTF-8。';
+            }
+            const metaDescription = document.createElement('p');
+            metaDescription.textContent = description;
+            domReferences.canvas.appendChild(metaDescription);
+        }
+        domReferences.canvas.appendChild(content); // 將內容添加到畫布
+    }
+};
+
+/**
+ * 處理 CSS 第一部分的特殊邏輯
+ * @param {string} cssData - CSS 數據
+ * @param {HTMLElement} styleTag - 用於存放 CSS 規則的 style 標籤
+ */
+const handleCssFirstSection = (cssData, styleTag) => {
+    const canvas = domReferences.canvas;
+    const cssFirstSectionMap = {
+        tag: 'p { color: green; }',
+        '#id': '#example-id { color: blue; }',
+        '.class': '.example-class { color: orange; }',
+        '!important': 'p { color: red !important; }',
+    };
+
+    if (cssFirstSectionMap[cssData]) {
+        styleTag.textContent = cssFirstSectionMap[cssData]; // 設置對應的 CSS
+        showCssSpecificity(cssFirstSectionMap[cssData]); // 顯示 CSS 特異性
+    }
+};
+
+/**
+ * 將 HTML 內容添加到畫布
+ * @param {string} html - 要添加到畫布的 HTML 內容
+ */
+const appendHtmlToCanvas = (html) => {
+    const wrapper = document.createElement('div'); // 創建一個包裝 div
+    wrapper.innerHTML = html; // 將 HTML 設置為包裝 div 的內容
+    const content = wrapper.firstElementChild; // 獲取包裝 div 的第一個子元素
+    if (content) {
+        domReferences.canvas.appendChild(content); // 將內容添加到畫布
+    }
+};
+
 
 // 初始調整
 export const adjustCanvasPosition = () => {

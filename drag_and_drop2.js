@@ -781,6 +781,7 @@ canvas.addEventListener('drop', (e) => {
   }
 });
 
+
 // 處理 CSS 的拖放邏輯
 const handleCssDrop = (cssData, isCssFirstSection) => {
   const styleTag = document.createElement('style'); // 創建一個 <style> 標籤
@@ -989,4 +990,4 @@ addDragEvents();
 
 document.getElementById('clearCanvas').addEventListener('click', updateCodeDisplay);
 // 初始化預設標籤
-loadDefaultTags();
+//loadDefaultTags();

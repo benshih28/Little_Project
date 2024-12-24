@@ -8,9 +8,17 @@ import { updateCssDisplay } from './utils.js';
  * @param {string} content - 要填充到畫布的 HTML
  */
 export const clearCanvas = (canvas, cssRules, cssDisplay, content = '') => {
+    
+    //測試調用
+    if (!canvas) {
+        console.error('Canvas element is undefined');
+        return;
+    }
+    
+    
     canvas.innerHTML = content; // 清空畫布並填充內容
     cssRules.length = 0; // 清空 CSS 規則
-    updateCssDisplay(cssDisplay, cssRules); // 更新 CSS 顯示
+    updateCssDisplay(cssRules); // 更新 CSS 顯示
 
     // 移除所有應用的樣式
     const existingStyles = document.querySelectorAll('style');

@@ -4,15 +4,18 @@ import {
     cssPseudoClassTags, 
     cssStructurePseudoClassTags, 
     cssAttributePseudoClassTags, 
-    cssBorderTags, 
+    cssBorderTags,
+    defaultTags, 
     styleTags, 
     structureTags, 
     listTags, 
     linkTags, 
     mediaTags, 
     tableTags, 
-    formTags 
+    formTags, 
+    metaTags 
 } from './tagsContent.js';
+
 
 import { 
     clearCanvas, 
@@ -53,4 +56,5 @@ export const handlersConfig = [
     { type: 'html', id: 'loadFormTags', content: formTags, extraHandlers: [
         { buttonId: 'configureFormButton', handler: showFormContentBuilder },
     ]},
+    { type: 'html', id: 'loadmetaTags', content: metaTags },
 ];
