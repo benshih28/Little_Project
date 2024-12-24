@@ -1,59 +1,34 @@
-// 主程式入口: main.js
+import { domReferences } from './modules/domReferences.js'; // 引入 DOM 參考
+import { handlersConfig } from './modules/handlersConfig.js'; // 引入事件處理器配置
+import { setupTagHandlers } from './modules/tagHandlers.js'; // 引入標籤處理器設置函數
+import { adjustCanvasPosition, addDragEvents, updateCodeDisplay, initializeCanvasEvents } from './modules/utils.js'; // 引入實用工具函數
+import { clearCanvas } from './modules/canvasClearHandlers.js'; // 引入清空畫布函數
 
-// 匯入模組
-import { addDragEvents } from './modules/dragAndDrop.js';
-import { updateCssDisplay, resetCanvasAndCss, addCssRule } from './modules/cssTools.js';
-import { updateCodeDisplay, updateCodeDisplayCSS_HTML, clearCanvas, addCustomHTML } from './modules/htmlTools.js';
-import { adjustCanvasPosition, initializeCanvas } from './modules/canvasManager.js';
-import { createModal, showDefaultModal } from './modules/modalBuilder.js';
+// 初始畫布位置調整
+adjustCanvasPosition();
+window.addEventListener('resize', adjustCanvasPosition); // 當窗口大小改變時調整畫布位置
 
-// 初始化主要元件
-const canvas = document.getElementById('canvas');
-const cssDisplay = document.getElementById('cssDisplay');
-const codeDisplay = document.getElementById('codeDisplay');
-const dragItemsContainer = document.getElementById('dragItems');
+const cssRules = []; // 確保 cssRules 被初始化為一個陣列
 
-// 初始化畫布
-initializeCanvas(canvas, cssDisplay, adjustCanvasPosition);
+// 綁定事件處理器
+setupTagHandlers(
+    handlersConfig, // 事件處理器配置
+    domReferences.dragItemsContainer, // 拖曳項目容器
+    addDragEvents, // 添加拖曳事件
+    domReferences.customHtmlContainer, // 自訂 HTML 容器
+    cssRules // CSS 規則陣列
+);
 
-// 添加拖放功能
-addDragEvents();
+// 設定拖拽事件
+addDragEvents(); // 為拖曳項目添加拖曳事件
 
-// 預設標籤載入
-const loadDefaultTags = () => {
-    const defaultTags = `
-        <div class="drag-item" draggable="true" data-html="<p>這是一段文字</p>">段落 (p)</div>
-        <div class="drag-item" draggable="true" data-html="<h1>標題 H1</h1>">標題 (h1)</div>
-        <div class="drag-item" draggable="true" data-html="<a href='#'>連結</a>">連結 (a)</div>
-    `;
-    dragItemsContainer.innerHTML = defaultTags;
-    addDragEvents();
-};
-loadDefaultTags();
-
-// 自訂 HTML 功能
-const customHTMLInput = document.getElementById('customHTML');
-const addCustomHTMLButton = document.getElementById('addCustomHTML');
-addCustomHTMLButton.addEventListener('click', () => {
-    const customHTML = customHTMLInput.value;
-    addCustomHTML(customHTML, dragItemsContainer, addDragEvents);
-    customHTMLInput.value = '';
-});
+// 初始化 canvas 事件
+initializeCanvasEvents(cssRules); // 初始化畫布的拖放事件
 
 // 清空畫布功能
-const clearCanvasButton = document.getElementById('clearCanvas');
-clearCanvasButton.addEventListener('click', () => {
-    clearCanvas(canvas, [], cssDisplay);
-    updateCodeDisplay(canvas, codeDisplay);
+domReferences.clearCanvasButton.addEventListener('click', () => {
+    clearCanvas(domReferences.canvas, cssRules, domReferences.cssDisplay); // 清空畫布並更新 CSS 顯示
+    updateCodeDisplay(); // 更新代碼顯示
 });
-
-// 提示示例模態框
-const showInfoButton = document.getElementById('showInfo');
-showInfoButton.addEventListener('click', () => {
-    showDefaultModal('提示', '這是示例模態框的內容！');
-});
-
-// 畫布變更後更新程式碼顯示
-canvas.addEventListener('DOMSubtreeModified', () => {
-    updateCodeDisplay(canvas, codeDisplay);
-});
+// 初始化預設標籤
+//loadDefaultTags();
