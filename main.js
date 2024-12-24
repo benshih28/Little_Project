@@ -10,6 +10,8 @@ window.addEventListener('resize', adjustCanvasPosition); // 當窗口大小改�
 
 const cssRules = []; // 確保 cssRules 被初始化為一個陣列
 
+console.log('Setting up tag handlers'); // 調試訊息
+
 // 綁定事件處理器
 setupTagHandlers(
     handlersConfig, // 事件處理器配置
@@ -19,8 +21,11 @@ setupTagHandlers(
     cssRules // CSS 規則陣列
 );
 
+console.log('Tag handlers setup complete'); // 調試訊息
+
 // 設定拖拽事件
 addDragEvents(); // 為拖曳項目添加拖曳事件
+console.log('Drag events added'); // 調試訊息
 
 // 初始化 canvas 事件
 initializeCanvasEvents(cssRules); // 初始化畫布的拖放事件
@@ -30,5 +35,21 @@ domReferences.clearCanvasButton.addEventListener('click', () => {
     clearCanvas(domReferences.canvas, cssRules, domReferences.cssDisplay); // 清空畫布並更新 CSS 顯示
     updateCodeDisplay(); // 更新代碼顯示
 });
-// 初始化預設標籤
-//loadDefaultTags();
+
+// 綁定新增自訂 HTML 按鈕事件
+domReferences.addCustomHTMLButton.addEventListener('click', () => {
+    const customHTML = document.getElementById('customHTML').value.trim();
+    if (customHTML) {
+        const newItem = document.createElement('div');
+        newItem.className = 'drag-item';
+        newItem.draggable = true;
+        newItem.setAttribute('data-html', customHTML);
+        newItem.textContent = `自訂項目 - ${customHTML.slice(0, 15)}...`;
+        domReferences.dragItemsContainer.appendChild(newItem);
+        addDragEvents(); // 為新添加的項目添加拖拽事件
+        document.getElementById('customHTML').value = '';
+        console.log('Custom HTML added'); // 調試訊息
+    } else {
+        alert('請輸入有效的 HTML 代碼！');
+    }
+});

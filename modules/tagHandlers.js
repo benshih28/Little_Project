@@ -12,10 +12,14 @@ export const setupTagHandlers = (handlersConfig, dragItemsContainer, addDragEven
     handlersConfig.forEach(({ id, content, clearCanvas, extraHandlers }) => {
         const button = document.getElementById(id); // 獲取按鈕元素
         if (button) {
+            console.log(`Button with id ${id} found`); // 調試訊息
             button.addEventListener('click', () => {
+                console.log(`Button with id ${id} clicked`); // 調試訊息
                 if (content) {
                     dragItemsContainer.innerHTML = content; // 更新標籤內容
+                    console.log('Content updated'); // 調試訊息
                     addDragEvents(); // 添加拖拽事件
+                    console.log('Drag events added'); // 調試訊息
                     customHtmlContainer.style.display = 'block'; // 顯示自訂 HTML 區域
                 }
                 if (clearCanvas) clearCanvas(domReferences.canvas, cssRules, domReferences.cssDisplay); // 清空畫布
@@ -25,11 +29,14 @@ export const setupTagHandlers = (handlersConfig, dragItemsContainer, addDragEven
                     extraHandlers.forEach(({ buttonId, handler }) => {
                         const extraButton = document.getElementById(buttonId); // 獲取額外按鈕元素
                         if (extraButton) {
+                            console.log(`Extra button with id ${buttonId} found`); // 調試訊息
                             extraButton.addEventListener('click', handler); // 綁定額外按鈕事件
                         }
                     });
                 }
             });
+        } else {
+            console.error(`Button with id ${id} not found`); //  調試訊息
         }
     });
 };
