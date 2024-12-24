@@ -13,7 +13,8 @@ import {
     mediaTags, 
     tableTags, 
     formTags, 
-    metaTags 
+    metaTags, 
+    rwdTags // 修正引入錯誤
 } from './tagsContent.js';
 
 
@@ -30,7 +31,10 @@ import {
     showOlForm, 
     showLiForm, 
     showTableForm, 
-    showFormContentBuilder 
+    showFormContentBuilder,
+    simulateMobileWidth, 
+    simulateTabletWidth, 
+    simulateDesktopWidth 
 } from './utils.js';
 
 export const handlersConfig = [
@@ -57,4 +61,9 @@ export const handlersConfig = [
         { buttonId: 'configureFormButton', handler: showFormContentBuilder },
     ]},
     { type: 'html', id: 'loadmetaTags', content: metaTags },
+    { type: 'html', id: 'loadRWDTags', content: rwdTags, extraHandlers: [
+        { buttonId: 'simulateMobileWidth', handler: simulateMobileWidth },
+        { buttonId: 'simulateTabletWidth', handler: simulateTabletWidth },
+        { buttonId: 'simulateDesktopWidth', handler: simulateDesktopWidth },
+    ]},
 ];

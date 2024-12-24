@@ -169,6 +169,8 @@ export const formTags = `
     <button id="configureFormButton" class="btn btn-success">設定表單內容</button>
 `;
 
+
+// Meta 標籤
 export const metaTags = `
     <div class="drag-item" draggable="true" data-html='<meta charset="UTF-8">'>Meta Charset（字符集標籤）</div>
     <div class="drag-item" draggable="true" data-html='<meta name="viewport" content="width=device-width, initial-scale=1.0">'>Meta Viewport（視窗設置標籤）</div>
@@ -176,4 +178,11 @@ export const metaTags = `
     <div class="drag-item" draggable="true" data-html='<meta name="robots" content="index, follow">'>Meta Robots（機器人標籤）</div>
     <div class="drag-item" draggable="true" data-html='<meta property="og:title" content="網頁標題"><meta property="og:description" content="網頁描述"><meta property="og:image" content="https://example.com/image.jpg"><meta property="og:url" content="https://example.com">'>Open Graph（OG 標籤）</div>
     <div class="drag-item" draggable="true" data-html='<link rel="canonical" href="https://example.com">'>Canonical Tag（正規化 URL）</div>
+`;
+
+// RWD 標籤
+export const rwdTags = `
+    <button id="simulateMobileWidth" class="btn btn-primary">模擬手機寬度</button>
+    <button id="simulateTabletWidth" class="btn btn-secondary">模擬平板寬度</button>
+    <button id="simulateDesktopWidth" class="btn btn-success">模擬桌面寬度</button>
 `;

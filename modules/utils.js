@@ -619,30 +619,31 @@ const handleHtmlDrop = (htmlData) => {
     if (content) {
         if (content.tagName === 'META' || content.tagName === 'LINK') {
             let description = '';
-            switch (content.getAttribute('name') || content.getAttribute('property') || content.getAttribute('rel')) {
-                case 'charset':
-                    description = '用於設定網頁字符編碼，通常設置為 UTF-8。';
-                    break;
-                case 'viewport':
-                    description = '用於優化行動裝置上的顯示。';
-                    break;
-                case 'keywords':
-                    description = '已被大多數搜尋引擎忽略，現在通常不用。';
-                    break;
-                case 'robots':
-                    description = '指示搜尋引擎是否應該索引該頁面，以及是否應跟隨頁面上的連結。';
-                    break;
-                case 'og:title':
-                case 'og:description':
-                case 'og:image':
-                case 'og:url':
-                    description = '用於優化社群平台上的分享效果，例如 Facebook 和 LinkedIn。';
-                    break;
-                case 'canonical':
-                    description = '告訴搜尋引擎網頁的正規版本，避免重複內容問題。';
-                    break;
-                default:
-                    description = '用於設定網頁字符編碼，通常設置為 UTF-8。';
+            if (content.hasAttribute('charset')) {
+                description = '用於設定網頁字符編碼，通常設置為 UTF-8。';
+            } else {
+                switch (content.getAttribute('name') || content.getAttribute('property') || content.getAttribute('rel')) {
+                    case 'viewport':
+                        description = '用於優化行動裝置上的顯示。';
+                        break;
+                    case 'keywords':
+                        description = '已被大多數搜尋引擎忽略，現在通常不用。';
+                        break;
+                    case 'robots':
+                        description = '指示搜尋引擎是否應該索引該頁面，以及是否應跟隨頁面上的連結。';
+                        break;
+                    case 'og:title':
+                    case 'og:description':
+                    case 'og:image':
+                    case 'og:url':
+                        description = '用於優化社群平台上的分享效果，例如 Facebook 和 LinkedIn。';
+                        break;
+                    case 'canonical':
+                        description = '告訴搜尋引擎網頁的正規版本，避免重複內容問題。';
+                        break;
+                    default:
+                        description = 'Meta 標籤';
+                }
             }
             const metaDescription = document.createElement('p');
             metaDescription.textContent = description;
@@ -693,3 +694,26 @@ export const adjustCanvasPosition = () => {
 };
 adjustCanvasPosition();
 window.addEventListener('resize', adjustCanvasPosition);
+
+export const simulateMobileWidth = () => {
+    document.body.style.width = '375px';
+    document.body.style.margin = '0 auto';
+    updateCanvasMessage('手機模式: 畫布縮小到 375px');
+};
+
+export const simulateTabletWidth = () => {
+    document.body.style.width = '768px';
+    document.body.style.margin = '0 auto';
+    updateCanvasMessage('平板模式: 畫布縮小到 768px');
+};
+
+export const simulateDesktopWidth = () => {
+    document.body.style.width = '1024px';
+    document.body.style.margin = '0 auto';
+    updateCanvasMessage('桌面模式: 畫布放大到 1024px');
+};
+
+const updateCanvasMessage = (message) => {
+    const canvas = domReferences.canvas;
+    canvas.innerHTML = `<p class="text-muted">${message}</p>`;
+};
