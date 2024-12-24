@@ -26,6 +26,9 @@ export const updateCodeDisplay = () => {
  * @returns {number} - 優先級數值
  */
 export const calculateCssSpecificity = (selector) => {
+    if (!selector) {
+        return 0;
+    }
     const ids = (selector.match(/#/g) || []).length;
     const classes = (selector.match(/(\.[\w-]+|\[[^\]]+\]|::?[\w-]+)/g) || []).length;
     const tags = (selector.match(/^[a-zA-Z]+|[ >+~][a-zA-Z]+/g) || []).length;
@@ -34,14 +37,18 @@ export const calculateCssSpecificity = (selector) => {
 
 /**
  * 顯示 CSS 選擇器的優先級
- * @param {HTMLElement} canvas - 畫布元素
  * @param {string} selector - CSS 選擇器
  */
-export const showCssSpecificity = (canvas, selector) => {
+export const showCssSpecificity = (selector) => {
+    const canvas = domReferences.canvas;
+    if (!canvas || !(canvas instanceof HTMLElement)) {
+        console.error('Invalid canvas element');
+        return;
+    }
     const specificity = calculateCssSpecificity(selector);
-    const specificityDisplay = document.createElement('p');
-    specificityDisplay.textContent = `選擇器: ${selector}，優先級: ${specificity}`;
-    canvas.appendChild(specificityDisplay);
+    const specificityElement = document.createElement('p');
+    specificityElement.textContent = `選擇器: ${selector}，優先級: ${specificity}`;
+    canvas.appendChild(specificityElement);
 };
 
 
@@ -305,16 +312,13 @@ export const showTableForm = () => {
 
         tableHtml += '</tbody></table>';
 
+        const newDragItem = document.createElement('div');
+        newDragItem.className = 'drag-item';
+        newDragItem.draggable = true;
+        newDragItem.setAttribute('data-html', tableHtml);
+        newDragItem.textContent = `表格 (${rows}x${cols})`;
 
-
-
-        const dragItem = document.createElement('div');
-        dragItem.className = 'drag-item';
-        dragItem.draggable = true;
-        dragItem.setAttribute('data-html', tableHtml);
-        dragItem.textContent = `表格 (${rows}x${cols})`;
-
-        dragItemsContainer.appendChild(dragItem);
+        domReferences.dragItemsContainer.appendChild(newDragItem);
         addDragEvents();
 
         document.body.removeChild(modal);
@@ -466,7 +470,7 @@ export const showFormContentBuilder = () => {
         dragItem.setAttribute('data-html', formContent);
         dragItem.textContent = '自訂表單';
 
-        dragItemsContainer.appendChild(dragItem);
+        domReferences.dragItemsContainer.appendChild(dragItem);
         addDragEvents();
 
         document.body.removeChild(modal);
@@ -498,8 +502,13 @@ export const addDragEvents = () => {
 
 // 新增 canvas 的 dragover 和 drop 事件處理器
 export const initializeCanvasEvents = (cssRules) => {
-    domReferences.canvas.addEventListener('dragover', (e) => e.preventDefault()); // 防止默認行為以允許拖放
-    domReferences.canvas.addEventListener('drop', (e) => {
+    const canvas = domReferences.canvas;
+    if (!canvas) {
+        console.error('Invalid canvas element');
+        return;
+    }
+    canvas.addEventListener('dragover', (e) => e.preventDefault()); // 防止默認行為以允許拖放
+    canvas.addEventListener('drop', (e) => {
         e.preventDefault();
         const htmlData = e.dataTransfer.getData('text/html');
         const cssData = e.dataTransfer.getData('text/css');
@@ -559,7 +568,7 @@ const handleCssDrop = (cssData, isCssFirstSection, cssRules) => {
         '::before': '<p>在段落前添加橙色圓點</p>',
         '::after': '<p>在段落後添加灰色結尾</p>',
         '^=': '<p>選擇屬性值開頭為 "設定內容" 的元素加粗</p>',
-        '*=': '<p>選擇屬性值包含 "設定內容" 的元素背景設為淺黃色</p>',
+        '*=': '<p>選擇屬性值包含 "設定內容" 的元素背景設為淺綠色</p>',
         '$=': '<p>選擇屬性值結尾為 "設定內容" 的元素文字顏色設為綠色</p>',
         '[]': '<p>完全匹配屬性值添加下劃線，文字顏色設為藍色 </p>',
     };
@@ -612,6 +621,7 @@ const handleHtmlDrop = (htmlData) => {
  * @param {HTMLElement} styleTag - 用於存放 CSS 規則的 style 標籤
  */
 const handleCssFirstSection = (cssData, styleTag) => {
+    const canvas = domReferences.canvas;
     const cssFirstSectionMap = {
         tag: 'p { color: green; }',
         '#id': '#example-id { color: blue; }',
@@ -621,7 +631,7 @@ const handleCssFirstSection = (cssData, styleTag) => {
 
     if (cssFirstSectionMap[cssData]) {
         styleTag.textContent = cssFirstSectionMap[cssData]; // 設置對應的 CSS
-        showCssSpecificity(cssData); // 顯示 CSS 特異性
+        showCssSpecificity(cssFirstSectionMap[cssData]); // 顯示 CSS 特異性
     }
 };
 
