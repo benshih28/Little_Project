@@ -7,4 +7,6 @@ export const domReferences = {
     clearCanvasButton: document.getElementById('clearCanvas'), // 確保這一行正確
     customHtmlContainer: document.getElementById('customHtmlContainer'),
     addCustomHTMLButton: document.getElementById('addCustomHTML'),
+    loadCssVariableTagsButton: document.getElementById('loadCssVariableTags'), // 新增引用
+    configureCssVariableButton: document.getElementById('configureCssVariableButton'), // 新增引用
 };

@@ -103,6 +103,71 @@ export const clearCanvasAttributePseudoClass = (canvas, cssRules, cssDisplay) =>
     );
 };
 
+// 清空畫布 (繼承樣式)
+export const clearCanvasInheritance = (canvas, cssRules, cssDisplay) => {
+    clearCanvas(
+        canvas,
+        cssRules,
+        cssDisplay,
+        `
+        <div class="parent">
+            父元素 (設定顏色：藍色)
+            <div class="child">子元素 (繼承顏色)</div>
+        </div>
+        `
+    );
+
+    // 添加繼承樣式的 CSS 規則
+    const styleTag = document.createElement('style');
+    styleTag.textContent = `
+.parent {
+color: blue;
+font-size: 20px;
+border: 2px solid blue;
+padding: 10px;
+}
+    `;
+    document.head.appendChild(styleTag);
+    cssRules.push(styleTag.textContent);
+    updateCssDisplay(cssRules);
+};
+
+// 清空畫布並顯示 CSS 變數範例
+export const clearCanvasCssVariables = (canvas, cssRules, cssDisplay) => {
+    clearCanvas(
+        canvas,
+        cssRules,
+        cssDisplay,
+        `
+        <div class="box">
+            這是一個使用 CSS 變數的範例。
+        </div>
+        `
+    );
+
+    // 添加 CSS 變數的規則
+    const styleTag = document.createElement('style');
+    styleTag.textContent = `
+        :root {
+            --main-color: #4caf50;
+            --padding: 20px;
+            --font-size: 16px;
+        }
+        .box {
+            background-color: var(--main-color);
+            padding: var(--padding);
+            font-size: var(--font-size);
+            color: white;
+            text-align: center;
+            margin: 10px auto;
+            width: 80%;
+        }
+    `;
+    document.head.appendChild(styleTag);
+    cssRules.push(styleTag.textContent);
+    updateCssDisplay(cssRules);
+};
+
 /**
  * 清空畫布並初始化
  * @param {HTMLElement} canvas - 畫布元素

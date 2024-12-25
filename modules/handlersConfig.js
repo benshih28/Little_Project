@@ -5,6 +5,8 @@ import {
     cssStructurePseudoClassTags, 
     cssAttributePseudoClassTags, 
     cssBorderTags,
+    cssInheritanceTags, // 新增引入
+    cssVariableTags, // 新增引入
     defaultTags, 
     styleTags, 
     structureTags, 
@@ -12,7 +14,9 @@ import {
     linkTags, 
     mediaTags, 
     tableTags, 
-    formTags 
+    formTags, 
+    metaTags, 
+    rwdTags // 修正引入錯誤
 } from './tagsContent.js';
 
 
@@ -21,7 +25,8 @@ import {
     clearCanvasFamily, 
     clearCanvasPseudoClass, 
     clearCanvasStructurePseudoClass, 
-    clearCanvasAttributePseudoClass 
+    clearCanvasAttributePseudoClass,
+    clearCanvasInheritance // 新增引入
 } from './canvasClearHandlers.js';
 
 import { 
@@ -29,7 +34,11 @@ import {
     showOlForm, 
     showLiForm, 
     showTableForm, 
-    showFormContentBuilder 
+    showFormContentBuilder,
+    simulateMobileWidth, 
+    simulateTabletWidth, 
+    simulateDesktopWidth,
+    showCssVariableConfigModal // 新增引入
 } from './utils.js';
 
 export const handlersConfig = [
@@ -41,6 +50,10 @@ export const handlersConfig = [
     { type: 'css', id: 'loadCssBorderTags', content: cssBorderTags, clearCanvas: clearCanvas, extraHandlers: [
         { buttonId: 'configureBorderButton', handler: showBorderConfigModal },
     ]},
+    { type: 'css', id: 'loadCssInheritanceTags', content: cssInheritanceTags, clearCanvas: clearCanvasInheritance }, // 新增配置
+    { type: 'css', id: 'loadCssVariableTags', content: cssVariableTags, clearCanvas: clearCanvas, extraHandlers: [
+        { buttonId: 'configureCssVariableButton', handler: showCssVariableConfigModal },
+    ]}, // 新增配置
     { type: 'html', id: 'loadStyleTags', content: styleTags },
     { type: 'html', id: 'loadStructureTags', content: structureTags },
     { type: 'html', id: 'loadListTags', content: listTags, extraHandlers: [
@@ -54,5 +67,11 @@ export const handlersConfig = [
     ]},
     { type: 'html', id: 'loadFormTags', content: formTags, extraHandlers: [
         { buttonId: 'configureFormButton', handler: showFormContentBuilder },
+    ]},
+    { type: 'html', id: 'loadmetaTags', content: metaTags },
+    { type: 'html', id: 'loadRWDTags', content: rwdTags, extraHandlers: [
+        { buttonId: 'simulateMobileWidth', handler: simulateMobileWidth },
+        { buttonId: 'simulateTabletWidth', handler: simulateTabletWidth },
+        { buttonId: 'simulateDesktopWidth', handler: simulateDesktopWidth },
     ]},
 ];

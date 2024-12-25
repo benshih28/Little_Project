@@ -40,6 +40,19 @@ export const cssAttributePseudoClassTags = `
     <div class="drag-item" draggable="true" data-css="[]">[] 完全匹配選擇器</div>
 `;
 
+// CSS 變數標籤
+export const cssVariableTags = `
+    <div class="drag-item" draggable="true" data-css-variable="--main-color: #4caf50;">--main-color</div>
+    <div class="drag-item" draggable="true" data-css-variable="--padding: 20px;">--padding</div>
+    <div class="drag-item" draggable="true" data-css-variable="--font-size: 16px;">--font-size</div>
+    <button id="configureCssVariableButton" class="btn btn-info">配置 CSS 變數</button>
+`;
+
+// CSS 繼承樣式標籤
+export const cssInheritanceTags = `
+    <div class="drag-item" draggable="true" data-css="inheritance">Inheritance (繼承)</div>
+`;
+
 // CSS 邊框標籤
 export const cssBorderTags = `
     <div class="drag-item" draggable="true" data-css="border">預設邊框</div>
@@ -167,4 +180,22 @@ export const tableTags = `
 export const formTags = `
     <div class="drag-item" draggable="true" data-html='<form><select><option>預設選項</option></select></form>'>表單 (form)</div>
     <button id="configureFormButton" class="btn btn-success">設定表單內容</button>
+`;
+
+
+// Meta 標籤
+export const metaTags = `
+    <div class="drag-item" draggable="true" data-html='<meta charset="UTF-8">'>Meta Charset（字符集標籤）</div>
+    <div class="drag-item" draggable="true" data-html='<meta name="viewport" content="width=device-width, initial-scale=1.0">'>Meta Viewport（視窗設置標籤）</div>
+    <div class="drag-item" draggable="true" data-html='<meta name="keywords" content="關鍵字1, 關鍵字2, 關鍵字3">'>Meta Keywords（關鍵字標籤）</div>
+    <div class="drag-item" draggable="true" data-html='<meta name="robots" content="index, follow">'>Meta Robots（機器人標籤）</div>
+    <div class="drag-item" draggable="true" data-html='<meta property="og:title" content="網頁標題"><meta property="og:description" content="網頁描述"><meta property="og:image" content="https://example.com/image.jpg"><meta property="og:url" content="https://example.com">'>Open Graph（OG 標籤）</div>
+    <div class="drag-item" draggable="true" data-html='<link rel="canonical" href="https://example.com">'>Canonical Tag（正規化 URL）</div>
+`;
+
+// RWD 標籤
+export const rwdTags = `
+    <button id="simulateMobileWidth" class="btn btn-primary">模擬手機寬度</button>
+    <button id="simulateTabletWidth" class="btn btn-secondary">模擬平板寬度</button>
+    <button id="simulateDesktopWidth" class="btn btn-success">模擬桌面寬度</button>
 `;

@@ -4,17 +4,24 @@ import { domReferences } from './domReferences.js';
 
 /**
  * 更新 CSS 顯示
- * @param {HTMLElement} cssDisplay - 顯示 CSS 規則的元素
  * @param {Array} cssRules - CSS 規則陣列
  */
 export const updateCssDisplay = (cssRules) => {
-    domReferences.cssDisplay.textContent = cssRules.join('\n');
+    if (domReferences.cssDisplay && cssRules) {
+        domReferences.cssDisplay.textContent = cssRules.join('\n');
+    }
 };
 
 
 export const updateCodeDisplay = () => {
     const content = Array.from(domReferences.canvas.children)
         .filter(child => !(child.tagName === 'P' && child.classList.contains('text-muted')))
+        .filter(child => !(child.tagName === 'P' && child.textContent.includes('用於設定網頁字符編碼，通常設置為 UTF-8。')))
+        .filter(child => !(child.tagName === 'P' && child.textContent.includes('用於優化行動裝置上的顯示。')))
+        .filter(child => !(child.tagName === 'P' && child.textContent.includes('已被大多數搜尋引擎忽略，現在通常不用。')))
+        .filter(child => !(child.tagName === 'P' && child.textContent.includes('指示搜尋引擎是否應該索引該頁面，以及是否應跟隨頁面上的連結。')))
+        .filter(child => !(child.tagName === 'P' && child.textContent.includes('用於優化社群平台上的分享效果，例如 Facebook 和 LinkedIn。')))
+        .filter(child => !(child.tagName === 'P' && child.textContent.includes('告訴搜尋引擎網頁的正規版本，避免重複內容問題。')))
         .map(child => child.outerHTML)
         .join('\n');
     domReferences.codeDisplay.textContent = content;
@@ -481,6 +488,69 @@ export const showFormContentBuilder = () => {
     });
 };
 
+/**
+ * 顯示 CSS 變數配置彈窗
+ */
+export const showCssVariableConfigModal = () => {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'block';
+    modal.style.position = 'fixed';
+    modal.style.top = '50%';
+    modal.style.left = '50%';
+    modal.style.transform = 'translate(-50%, -50%)';
+    modal.style.backgroundColor = 'white';
+    modal.style.padding = '20px';
+    modal.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+    modal.style.width = '400px';
+
+    modal.innerHTML = `
+        <form id="cssVariableForm">
+            <h5>配置 CSS 變數</h5>
+            <label for="mainColor">主色調:</label>
+            <input type="color" id="mainColor" class="form-control" value="#4caf50">
+
+            <label for="padding" class="mt-2">內距 (px):</label>
+            <input type="number" id="padding" class="form-control" placeholder="例如：20">
+
+            <label for="fontSize" class="mt-2">字體大小 (px):</label>
+            <input type="number" id="fontSize" class="form-control" placeholder="例如：16">
+
+            <button type="button" id="applyCssVariables" class="btn btn-primary mt-3">生成拖曳標籤</button>
+            <button type="button" id="closeCssVariableConfigModal" class="btn btn-secondary mt-3">關閉</button>
+        </form>
+    `;
+
+    document.body.appendChild(modal);
+
+    // 生成拖曳標籤
+    document.getElementById('applyCssVariables').addEventListener('click', () => {
+        const mainColor = document.getElementById('mainColor').value;
+        const padding = document.getElementById('padding').value || '20';
+        const fontSize = document.getElementById('fontSize').value || '16';
+
+        const cssVariables = `
+            --main-color: ${mainColor};
+            --padding: ${padding}px;
+            --font-size: ${fontSize}px;
+        `;
+
+        const newDragItem = document.createElement('div');
+        newDragItem.className = 'drag-item';
+        newDragItem.draggable = true;
+        newDragItem.setAttribute('data-css-variable', cssVariables);
+        newDragItem.textContent = `CSS 變數 (主色調: ${mainColor}, 內距: ${padding}px, 字體大小: ${fontSize}px)`;
+        domReferences.dragItemsContainer.appendChild(newDragItem);
+        addDragEvents();
+
+        document.body.removeChild(modal);
+    });
+
+    // 關閉彈窗
+    document.getElementById('closeCssVariableConfigModal').addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
+};
 
 // 設定拖拽事件
 export const addDragEvents = () => {
@@ -489,6 +559,7 @@ export const addDragEvents = () => {
 
             const cssData = item.getAttribute('data-css');
             const htmlData = item.getAttribute('data-html');
+            const cssVariable = item.getAttribute('data-css-variable');
 
             if (cssData) {
                 e.dataTransfer.setData('text/css', cssData);
@@ -496,9 +567,25 @@ export const addDragEvents = () => {
             if (htmlData) {
                 e.dataTransfer.setData('text/html', htmlData);
             }
+            if (cssVariable) {
+                e.dataTransfer.setData('text/css-variable', cssVariable);
+            }
         });
     });
 };
+
+// 處理 CSS 變數的拖放邏輯
+const handleCssVariableDrop = (cssVariable, cssRules = []) => {
+    const rootStyle = document.documentElement.style;
+    const variables = cssVariable.split(';').filter(Boolean);
+    variables.forEach(variable => {
+        const [name, value] = variable.split(':');
+        if (name && value) {
+            rootStyle.setProperty(name.trim(), value.trim());
+        }
+    });
+    updateCssDisplay(cssRules);
+}; 
 
 // 新增 canvas 的 dragover 和 drop 事件處理器
 export const initializeCanvasEvents = (cssRules) => {
@@ -512,12 +599,16 @@ export const initializeCanvasEvents = (cssRules) => {
         e.preventDefault();
         const htmlData = e.dataTransfer.getData('text/html');
         const cssData = e.dataTransfer.getData('text/css');
+        const cssVariable = e.dataTransfer.getData('text/css-variable');
         const isCssFirstSection = checkIsCssFirstSection();
         if (cssData) {
             handleCssDrop(cssData, isCssFirstSection, cssRules);
         }
         if (htmlData) {
             handleHtmlDrop(htmlData);
+        }
+        if (cssVariable) {
+            handleCssVariableDrop(cssVariable, cssRules);
         }
         updateCodeDisplay();
     });
@@ -552,6 +643,7 @@ const handleCssDrop = (cssData, isCssFirstSection, cssRules) => {
         '*=': '[data-info*="middle"] { background-color: lightyellow; }',
         '$=': '[data-info$="end"] { color: green; }',
         '[]': '[data-category="external"] { text-decoration: underline; color: blue; }',
+        'inheritance': '.child { border: 1px dashed gray; padding: 5px; }',
     };
 
     // 將 CSS 對應的 HTML 內容添加到畫布的映射表
@@ -611,6 +703,38 @@ const handleHtmlDrop = (htmlData) => {
     wrapper.innerHTML = htmlData; // 將 HTML 數據設置為包裝 div 的內容
     const content = wrapper.firstElementChild; // 獲取包裝 div 的第一個子元素
     if (content) {
+        if (content.tagName === 'META' || content.tagName === 'LINK') {
+            let description = '';
+            if (content.hasAttribute('charset')) {
+                description = '用於設定網頁字符編碼，通常設置為 UTF-8。';
+            } else {
+                switch (content.getAttribute('name') || content.getAttribute('property') || content.getAttribute('rel')) {
+                    case 'viewport':
+                        description = '用於優化行動裝置上的顯示。';
+                        break;
+                    case 'keywords':
+                        description = '已被大多數搜尋引擎忽略，現在通常不用。';
+                        break;
+                    case 'robots':
+                        description = '指示搜尋引擎是否應該索引該頁面，以及是否應跟隨頁面上的連結。';
+                        break;
+                    case 'og:title':
+                    case 'og:description':
+                    case 'og:image':
+                    case 'og:url':
+                        description = '用於優化社群平台上的分享效果，例如 Facebook 和 LinkedIn。';
+                        break;
+                    case 'canonical':
+                        description = '告訴搜尋引擎網頁的正規版本，避免重複內容問題。';
+                        break;
+                    default:
+                        description = 'Meta 標籤';
+                }
+            }
+            const metaDescription = document.createElement('p');
+            metaDescription.textContent = description;
+            domReferences.canvas.appendChild(metaDescription);
+        }
         domReferences.canvas.appendChild(content); // 將內容添加到畫布
     }
 };
@@ -656,3 +780,26 @@ export const adjustCanvasPosition = () => {
 };
 adjustCanvasPosition();
 window.addEventListener('resize', adjustCanvasPosition);
+
+export const simulateMobileWidth = () => {
+    document.body.style.width = '375px';
+    document.body.style.margin = '0 auto';
+    updateCanvasMessage('手機模式: 畫布縮小到 375px');
+};
+
+export const simulateTabletWidth = () => {
+    document.body.style.width = '768px';
+    document.body.style.margin = '0 auto';
+    updateCanvasMessage('平板模式: 畫布縮小到 768px');
+};
+
+export const simulateDesktopWidth = () => {
+    document.body.style.width = '1024px';
+    document.body.style.margin = '0 auto';
+    updateCanvasMessage('桌面模式: 畫布放大到 1024px');
+};
+
+const updateCanvasMessage = (message) => {
+    const canvas = domReferences.canvas;
+    canvas.innerHTML = `<p class="text-muted">${message}</p>`;
+};
