@@ -1,7 +1,8 @@
 import { domReferences } from './modules/domReferences.js'; // 引入 DOM 參考
 import { handlersConfig } from './modules/handlersConfig.js'; // 引入事件處理器配置
 import { setupTagHandlers } from './modules/tagHandlers.js'; // 引入標籤處理器設置函數
-import { adjustCanvasPosition, addDragEvents, updateCodeDisplay, initializeCanvasEvents } from './modules/utils.js'; // 引入實用工具函數
+import { adjustCanvasPosition, addDragEvents, updateCodeDisplay } from './modules/htmlUtils.js'; // 修改為 htmlUtils.js
+import {initializeCanvasEvents} from './modules/cssUtils.js'; // 引入初始化畫布事件
 import { clearCanvas } from './modules/canvasClearHandlers.js'; // 引入清空畫布函數
 
 // 初始畫布位置調整

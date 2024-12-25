@@ -26,7 +26,8 @@ import {
     clearCanvasPseudoClass, 
     clearCanvasStructurePseudoClass, 
     clearCanvasAttributePseudoClass,
-    clearCanvasInheritance // 新增引入
+    clearCanvasInheritance,
+    clearCanvasCssVariables
 } from './canvasClearHandlers.js';
 
 import { 
@@ -38,8 +39,10 @@ import {
     simulateMobileWidth, 
     simulateTabletWidth, 
     simulateDesktopWidth,
-    showCssVariableConfigModal // 新增引入
-} from './utils.js';
+} from './htmlUtils.js'; // 修改為 htmlUtils.js
+
+
+import{showCssVariableConfigModal} from './cssUtils.js';
 
 export const handlersConfig = [
     { type: 'css', id: 'loadCssTags', content: cssTags, clearCanvas: clearCanvas },
@@ -51,7 +54,7 @@ export const handlersConfig = [
         { buttonId: 'configureBorderButton', handler: showBorderConfigModal },
     ]},
     { type: 'css', id: 'loadCssInheritanceTags', content: cssInheritanceTags, clearCanvas: clearCanvasInheritance }, // 新增配置
-    { type: 'css', id: 'loadCssVariableTags', content: cssVariableTags, clearCanvas: clearCanvas, extraHandlers: [
+    { type: 'css', id: 'loadCssVariableTags', content: cssVariableTags, clearCanvas: clearCanvasCssVariables, extraHandlers: [
         { buttonId: 'configureCssVariableButton', handler: showCssVariableConfigModal },
     ]}, // 新增配置
     { type: 'html', id: 'loadStyleTags', content: styleTags },

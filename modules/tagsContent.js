@@ -42,9 +42,7 @@ export const cssAttributePseudoClassTags = `
 
 // CSS 變數標籤
 export const cssVariableTags = `
-    <div class="drag-item" draggable="true" data-css-variable="--main-color: #4caf50;">--main-color</div>
-    <div class="drag-item" draggable="true" data-css-variable="--padding: 20px;">--padding</div>
-    <div class="drag-item" draggable="true" data-css-variable="--font-size: 16px;">--font-size</div>
+    <div class="drag-item" draggable="true" data-css-variable="--main-color: #4caf50; --padding: 20px; --font-size: 16px;">var(--變數)</div>
     <button id="configureCssVariableButton" class="btn btn-info">配置 CSS 變數</button>
 `;
 
